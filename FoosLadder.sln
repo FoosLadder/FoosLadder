@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FoosLadder.Api", "FoosLadder\FoosLadder.Api\FoosLadder.Api.fsproj", "{A71F4B2A-72EC-446F-83EB-E81B4A77C7E1}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FoosLadder.Api", "FoosLadder.Api\FoosLadder.Api.fsproj", "{A71F4B2A-72EC-446F-83EB-E81B4A77C7E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E4AB3A11-8DA1-49E3-8828-B12C416B41D9}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoosLadder.Website", "FoosLadder\FoosLadder.Website\FoosLadder.Website.csproj", "{149880D6-3F0B-4F22-944E-8F31658A20C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoosLadder.Website", "FoosLadder.Website\FoosLadder.Website.csproj", "{149880D6-3F0B-4F22-944E-8F31658A20C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
