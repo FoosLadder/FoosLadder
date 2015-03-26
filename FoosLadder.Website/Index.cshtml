@@ -1,0 +1,17 @@
+﻿@using System.Web.Optimization
+<!doctype html>
+<html lang="en" ng-app="foosLadderApp">
+<head>
+    <meta charset="utf-8">
+    <title>FoosLadder</title>
+
+    @Styles.Render("~/css/extLibs")
+</head>
+<body>
+<h1>Test</h1>
+<div class="view-container">
+    <div ng-view class="view-frame"></div>
+</div>
+    @Scripts.Render("~/bundles/extLibs","~/bundles/app")
+</body>
+</html>

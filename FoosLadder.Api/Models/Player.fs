@@ -5,5 +5,7 @@ namespace FoosLadder.Api.Models
 type Player =
     {   FirstName : string
         LastName : string
-        TotalMatchesPlayed : int }
+        TotalMatchesPlayed : int
+        TotalMatchesWon : int
+        TotalMatchesLost : int }
 

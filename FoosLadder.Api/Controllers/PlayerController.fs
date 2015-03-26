@@ -13,23 +13,27 @@ open System.Web.Http.Cors
 type PlayerController() = 
     inherit ApiController()
     
-    let values = 
+    let mockPlayers = 
         [| { FirstName = "George"
              LastName = "Georgie"
-             TotalMatchesPlayed = 12 }
+             TotalMatchesPlayed = 12 
+             TotalMatchesWon = 6
+             TotalMatchesLost = 6}
            { FirstName = "Bob"
              LastName = "Bobby"
-             TotalMatchesPlayed = 33 } |]
+             TotalMatchesPlayed = 30
+             TotalMatchesWon = 15
+             TotalMatchesLost = 15} |]
     
     /// Gets all values.
     [<Route("players")>]
-    member x.Get() = values
+    member x.Get() = mockPlayers
     
-    member x.Post([<FromBody>] player : Player) = values |> Array.append [| player |]
+    member x.Post([<FromBody>] player : Player) = mockPlayers |> Array.append [| player |]
     /// Gets a single value at the specified index.
     [<Route("players/{id}")>]
     member x.Get(request : HttpRequestMessage, id : int) = 
-        if id >= 0 && values.Length > id then 
-            request.CreateResponse(values.[id])
+        if id >= 0 && mockPlayers.Length > id then 
+            request.CreateResponse(mockPlayers.[id])
         else 
             request.CreateResponse(HttpStatusCode.NotFound)
