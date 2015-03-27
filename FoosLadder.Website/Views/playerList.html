@@ -1,0 +1,37 @@
+﻿<div class="container">
+    <div class="row">
+        <!-- Uncomment for quering and ordering choices?-->
+        <!--<div class="col-md-2">
+        Search: <input ng-model="query">
+        <br/>
+        Sort by:
+        <select ng-model="orderProp">
+            <option value="-TotalMatchesWon">Total Wins</option>
+            <option value="-TotalMatchesLost">Total Losses</option>
+        </select>
+    </div>-->
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Plays</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="player in players | filter:query | orderBy:orderProp">
+                    <td ng-bind="$index + 1"></td>
+                    <td ng-bind="player.FirstName + ' ' + player.LastName"></td>
+                    <td ng-bind="player.TotalMatchesPlayed"></td>
+                    <td ng-bind="player.TotalMatchesWon"></td>
+                    <td ng-bind="player.TotalMatchesLost"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </div>
+</div>
