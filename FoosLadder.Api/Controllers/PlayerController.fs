@@ -10,7 +10,7 @@ open System.Web.Http
 type PlayerController() = 
     inherit ApiController()
     
-    let mockPlayers = MockPlayer.generateRandomPlayers 0 100 |> List.toArray
+    let mockPlayers = MockPlayer.generateRandomPlayers 0 10 |> List.toArray
     
     [<Route("players")>]
     member this.Get() = mockPlayers
