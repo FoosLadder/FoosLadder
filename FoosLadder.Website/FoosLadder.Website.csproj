@@ -119,8 +119,10 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\ApplicationViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="Content\app\" />
     <Folder Include="Fonts\" />
     <Folder Include="Images\" />

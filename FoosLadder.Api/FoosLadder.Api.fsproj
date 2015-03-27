@@ -118,9 +118,8 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Models\Player.fs" />
-    <Compile Include="MockData\MockPlayer.fs"/>
+    <Compile Include="MockData\MockPlayer.fs" />
     <Compile Include="Controllers\PlayerController.fs" />
-    <Compile Include="Controllers\HomeController.fs" />
     <Content Include="Web.config" />
     <Compile Include="Startup.fs" />
     <Compile Include="Global.fs" />
