@@ -6,8 +6,6 @@ open System.Net
 open System.Net.Http
 open System.Web.Http
 
-
-//[<EnableCorsAttribute(origins = "http://localhost:50441", headers = "*", methods = "*")>]
 [<RoutePrefix("api")>]
 type PlayerController() = 
     inherit ApiController()
