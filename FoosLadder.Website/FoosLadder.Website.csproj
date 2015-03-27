@@ -111,7 +111,7 @@
   <ItemGroup>
     <None Include="Index.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
-    <Content Include="Views\player-list.html" />
+    <Content Include="Views\playerList.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
