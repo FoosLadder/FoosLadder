@@ -1,6 +1,5 @@
 namespace FoosLadder.Api.Models
 
-
 [<CLIMutable>]
 type Player =
     {   FirstName : string
