@@ -2,7 +2,7 @@
 
 namespace FoosLadder.Website
 {
-    public class Global : Api.Global
+    public class Global : FoosLadder.Api.Global
     {
         protected void Application_Start(object sender, EventArgs e)
         {

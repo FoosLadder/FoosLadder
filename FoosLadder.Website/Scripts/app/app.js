@@ -13,7 +13,7 @@
         function($routeProvider) {
             $routeProvider
                 .when('/players', {
-                    templateUrl: 'views/player-list.html',
+                    templateUrl: 'views/playerList.html',
                     controller: 'PlayerListController'
                 })
                 .otherwise({
