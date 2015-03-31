@@ -16,6 +16,10 @@
                     templateUrl: 'views/playerList.html',
                     controller: 'PlayerListController'
                 })
+                .when('/scores/submit', {
+                    templateUrl: 'views/submitScores.html',
+                    controller: 'SubmitScoresController'
+                })
                 .otherwise({
                     redirectTo: '/players'
                 });

@@ -4,10 +4,10 @@
     'use strict';
     var foosLadderServices = angular.module('foosLadderApp.Services', []);
 
-    foosLadderServices.factory('PlayerService',["$http", function($http) {
+    foosLadderServices.factory('PlayerService', ["$http", function ($http) {
         var playerService = {};
         var players = [];
-        playerService.GetAll = function(callback) {
+        playerService.GetAll = function (callback) {
             if (players.length === 0) {
                 $http.get("http://localhost:48210/api/players").success(function (data) {
                     players = data;
@@ -19,5 +19,15 @@
         };
 
         return playerService;
+    }]);
+
+    foosLadderServices.factory('ScoreService', ["$http", function ($http) {
+        var service = {};
+        var players = [];
+        service.post = function (data) {
+            return $http.post("http://localhost:48210/api/scores", data);
+        };
+
+        return service;
     }]);
 })();
