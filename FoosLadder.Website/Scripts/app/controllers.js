@@ -8,7 +8,7 @@
         '$scope', 'PlayerService',
         function ($scope, playerService) {
             playerService.GetAll(function (data) {
-                $scope.scores = data;
+                $scope.players = data;
                 $scope.orderProp = '-TotalMatchesWon';
             });
         }

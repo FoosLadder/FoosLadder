@@ -1,17 +1,14 @@
 namespace FoosLadder.Api.DomainTypes
 
 module Players =
+
+    type PlayerIdentifier = int
+
     [<CLIMutable>]
     type Player =
-        {   FirstName : string
-            LastName : string }
-
-module Scores =
-    open Players
-
-    [<CLIMutable>]
-    type Score =
-        {   Player: Player
+        {   Id : PlayerIdentifier
+            FirstName : string
+            LastName : string
             TotalMatchesPlayed : int
             TotalMatchesWon : int
             TotalMatchesLost : int }
@@ -21,7 +18,7 @@ module Actions =
     open Players
 
     type UserAction =
-        { By : Player
+        { By : PlayerIdentifier
           At : DateTime }
 
 
@@ -35,23 +32,23 @@ module Matches =
     type GameResult = GameScore * GameScore
 
     type ProposedMatch = {
-        PlayerA : Player
-        PlayerB : Player
+        PlayerA : PlayerIdentifier
+        PlayerB : PlayerIdentifier
         MatchDate : DateTime option
         Challenged : UserAction
     }
 
     type AcceptedMatch = {
-        PlayerA : Player
-        PlayerB : Player
+        PlayerA : PlayerIdentifier
+        PlayerB : PlayerIdentifier
         MatchDate : DateTime
         Challenged : UserAction
         Accepted : UserAction
     }
 
     type UnverifiedMatch = {
-        PlayerA : Player
-        PlayerB : Player
+        PlayerA : PlayerIdentifier
+        PlayerB : PlayerIdentifier
         MatchDate : DateTime
         Challenged : UserAction
         Accepted : UserAction
@@ -60,16 +57,16 @@ module Matches =
     }
 
     type CompletedMatch = {
-        PlayerA : Player
-        PlayerB : Player
+        PlayerA : PlayerIdentifier
+        PlayerB : PlayerIdentifier
         MatchDate : DateTime
         Challenged : UserAction
         Accepted : UserAction
         GameResults : GameResult list
         Submitted : UserAction
         Verified : UserAction
-        Winner : Player
-        Loser : Player
+        Winner : PlayerIdentifier
+        Loser : PlayerIdentifier
     }
 
     type Match = 

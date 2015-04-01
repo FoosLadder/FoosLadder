@@ -63,35 +63,22 @@ module MockPlayers =
         "Yousefington";
         "Zeldington"
     ]
-
+    
+    let generatePlayerIds() = Gen.choose(0,10)
     let generateFirstName() = Gen.elements possibleFirstNames
     let generateLastName() = Gen.elements possibleLastNames
-
-    let createPlayer firstName lastName = 
-        {FirstName = firstName; LastName = lastName}
-
-    let generatePlayer = 
-        Gen.map2 createPlayer (generateFirstName()) (generateLastName())
-
-    let generateRandomPlayers size count =
-        let data = FsCheck.Gen.sample size count generatePlayer  
-        data
     
-module MockScores = 
-
-    open FoosLadder.Api.DomainTypes.Scores
-
     let generateWins() = Gen.choose(0,1000000)
     let generateLosses() = Gen.choose(0,1000000)
 
-    let createScore player wins losses = 
-        {Player = player; TotalMatchesPlayed=wins+losses; TotalMatchesWon = wins; TotalMatchesLost = losses}
+    let createPlayer id firstName lastName wins losses = 
+        {Id = id; FirstName = firstName; LastName = lastName; TotalMatchesPlayed=wins+losses; TotalMatchesWon = wins; TotalMatchesLost = losses}
 
-    let generateScore = 
-        Gen.map3 createScore MockPlayers.generatePlayer (generateWins()) (generateLosses())
+    let generatePlayer = 
+        Gen.map5 createPlayer (generatePlayerIds()) (generateFirstName()) (generateLastName()) (generateWins()) (generateLosses())
 
-    let generateRandomScores size count =
-        let data = FsCheck.Gen.sample size count generateScore  
+    let generateRandomPlayers size count =
+        let data = FsCheck.Gen.sample size count generatePlayer  
         data
     
 module MockMatch = 
@@ -122,7 +109,7 @@ module MockMatch =
     let generateMatch = 
         let gameScores = FsCheck.Gen.sample 0 5 (generateScores()) 
         let createMatchWithScores = (createMatch gameScores)
-        Gen.map4 createMatchWithScores MockPlayers.generatePlayer MockPlayers.generatePlayer (generateDates()) (generateDates())
+        Gen.map4 createMatchWithScores (MockPlayers.generatePlayerIds()) (MockPlayers.generatePlayerIds()) (generateDates()) (generateDates())
 
     let generateRandomMatches size count =
         let data = FsCheck.Gen.sample size count generateMatch  
