@@ -23,12 +23,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="player in players | filter:query | orderBy:orderProp">
+                <tr ng-repeat="score in scores | filter:query | orderBy:orderProp">
                     <td ng-bind="$index + 1"></td>
-                    <td ng-bind="player.FirstName + ' ' + player.LastName"></td>
-                    <td ng-bind="player.TotalMatchesPlayed"></td>
-                    <td ng-bind="player.TotalMatchesWon"></td>
-                    <td ng-bind="player.TotalMatchesLost"></td>
+                    <td ng-bind="score.Player.FirstName + ' ' + score.Player.LastName"></td>
+                    <td ng-bind="score.TotalMatchesPlayed"></td>
+                    <td ng-bind="score.TotalMatchesWon"></td>
+                    <td ng-bind="score.TotalMatchesLost"></td>
                 </tr>
             </tbody>
         </table>

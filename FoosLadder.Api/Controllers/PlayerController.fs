@@ -1,6 +1,6 @@
 namespace FoosLadder.Api.Controllers
 
-open FoosLadder.Api.Models
+open FoosLadder.Api.DomainTypes.Scores
 open FoosLadder.Api.MockData
 open System.Net
 open System.Net.Http
@@ -12,16 +12,16 @@ open System.Web.Http
 type PlayerController() = 
     inherit ApiController()
     
-    let mockPlayers = MockPlayer.generateRandomPlayers 0 100 |> List.toArray
+    let mockScores = MockScores.generateRandomScores 0 100 |> List.toArray
     
     [<Route("players")>]
-    member this.Get() = mockPlayers
+    member this.Get() = mockScores
     
-    member this.Post([<FromBody>] player : Player) = mockPlayers |> Array.append [| player |]
+    member this.Post([<FromBody>] score : Score) = mockScores |> Array.append [| score |]
     
     [<Route("players/{id}")>]
     member this.Get(request : HttpRequestMessage, id : int) = 
-        if id >= 0 && mockPlayers.Length > id then 
-            request.CreateResponse(mockPlayers.[id])
+        if id >= 0 && mockScores.Length > id then 
+            request.CreateResponse(mockScores.[id])
         else 
             request.CreateResponse(HttpStatusCode.NotFound)
