@@ -9,7 +9,7 @@
         function ($scope, playerService) {
             playerService.GetAll(function (data) {
                 $scope.players = data;
-                $scope.orderProp = '-TotalMatchesWon';
+                $scope.orderProp = '-totalMatchesWon';
             });
         }
     ]);

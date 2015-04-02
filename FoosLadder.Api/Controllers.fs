@@ -5,9 +5,10 @@ open System.Net.Http
 open System.Web.Http
 
 open FoosLadder.Api.CommonLibrary
+open FoosLadder.Api.CommonLibrary.Rop
+open FoosLadder.Api.Repositories
 
 module Helpers =
-
 
     let validateDTOs dtos =
         let context = System.Web.HttpContext.Current
@@ -24,34 +25,39 @@ module Helpers =
 
 module Players =
 
-    open FoosLadder.Api.MockData
+    open Helpers
     open FoosLadder.Api.DomainTypes.Players
 
     [<RoutePrefix("api/players")>]
     type PlayerController() = 
         inherit ApiController()
         
-        let mockPlayers = MockPlayers.generateRandomPlayers 0 100 |> List.toArray
-        
         [<Route("")>]
-        member this.Get() = mockPlayers
-        
-        [<Route("")>]
-        member this.Post([<FromBody>] player : Player) = mockPlayers |> Array.append [| player |]
+        member this.Get() = 
+            match PlayerDbContext.LoadAll () with
+            | Success records -> this.Ok(records)
+            | Failure _ -> this.Ok([||])
         
         [<Route("{id}")>]
-        member this.Get(request : HttpRequestMessage, id : int) = 
-            if id >= 0 && mockPlayers.Length > id then 
-                request.CreateResponse(mockPlayers.[id])
-            else 
-                request.CreateResponse(HttpStatusCode.NotFound)
+        member this.Get(id : int) = 
+            match PlayerDbContext.Load id with
+            | Success records -> this.Ok(records) :> IHttpActionResult
+            | Failure _ -> this.NotFound() :> IHttpActionResult
+        
+        [<Route("")>]
+        member this.Post([<FromBody>] player : Player) = 
+            let result =
+                validateDTOs
+                |> bind <| succeed player
+                |> bind PlayerDbContext.Store
+            match result with
+            | Success record -> this.Request.CreateResponse(record.Id)
+            | Failure _ -> this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "")
 
 module Matches =
 
     open Helpers
     open FoosLadder.Api.DomainTypes.Matches
-    open FoosLadder.Api.Repositories
-    open FoosLadder.Api.CommonLibrary.Rop
 
     [<RoutePrefix("api/matches")>]
     type MatchController() = 
@@ -64,7 +70,7 @@ module Matches =
             | Failure _ -> this.Ok([||])
         
         [<Route("{id}")>]
-        member this.Get(request : HttpRequestMessage, id : int) = 
+        member this.Get(id : int) = 
             match MatchDbContext.Load id with
             | Success records -> this.Ok(records) :> IHttpActionResult
             | Failure _ -> this.NotFound() :> IHttpActionResult

@@ -64,24 +64,23 @@ module MockPlayers =
         "Zeldington"
     ]
     
-    let generatePlayerIds() = Gen.choose(0,10)
     let generateFirstName() = Gen.elements possibleFirstNames
     let generateLastName() = Gen.elements possibleLastNames
     
     let generateWins() = Gen.choose(0,1000000)
     let generateLosses() = Gen.choose(0,1000000)
 
-    let createPlayer id firstName lastName wins losses = 
-        {Id = id; FirstName = firstName; LastName = lastName; TotalMatchesPlayed=wins+losses; TotalMatchesWon = wins; TotalMatchesLost = losses}
+    let createPlayer firstName lastName wins losses = 
+        {Id = 0; FirstName = firstName; LastName = lastName; TotalMatchesPlayed=wins+losses; TotalMatchesWon = wins; TotalMatchesLost = losses}
 
     let generatePlayer = 
-        Gen.map5 createPlayer (generatePlayerIds()) (generateFirstName()) (generateLastName()) (generateWins()) (generateLosses())
+        Gen.map4 createPlayer (generateFirstName()) (generateLastName()) (generateWins()) (generateLosses())
 
     let generateRandomPlayers size count =
         let data = FsCheck.Gen.sample size count generatePlayer  
         data
     
-module MockMatch = 
+module MockMatches = 
 
     open FoosLadder.Api.DomainTypes.Matches
     open System
@@ -89,13 +88,14 @@ module MockMatch =
     let generateDate seconds = DateTime.Now.AddSeconds(float -seconds)
     let generateScore index wins loses : GameResult = { Index = index; TeamA = wins; TeamB = loses }
     
-    let generateMatchIds() = Gen.choose(0,10)
     let generateDates() = Gen.map generateDate (Gen.choose(0,1000))
     let generateScores() = Gen.map3 generateScore (Gen.choose(0,5)) (Gen.choose(0,5)) (Gen.choose(0,5))
+    
+    let generatePlayerIds() = Gen.choose(0,10)
 
-    let createMatch gameScores id playerA playerB dateA dateB = 
+    let createMatch gameScores playerA playerB dateA dateB = 
         Match.Completed {
-            Id = id
+            Id = 0
             PlayerA = playerA
             PlayerB = playerB
             MatchDate = dateA
@@ -111,7 +111,7 @@ module MockMatch =
     let generateMatch = 
         let gameScores = FsCheck.Gen.sample 0 5 (generateScores()) 
         let createMatchWithScores = (createMatch gameScores)
-        Gen.map5 createMatchWithScores (generateMatchIds()) (MockPlayers.generatePlayerIds()) (MockPlayers.generatePlayerIds()) (generateDates()) (generateDates())
+        Gen.map4 createMatchWithScores (generatePlayerIds()) (generatePlayerIds()) (generateDates()) (generateDates())
 
     let generateRandomMatches size count =
         let data = FsCheck.Gen.sample size count generateMatch  
