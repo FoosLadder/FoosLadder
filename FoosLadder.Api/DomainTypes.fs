@@ -27,26 +27,33 @@ module Matches =
     open Actions
     open Players
 
-    type GameScore = int
+    type GameResult =
+        {    Index : int
+             TeamA : int
+             TeamB : int }
 
-    type GameResult = GameScore * GameScore
-
+    [<CLIMutable>]
     type ProposedMatch = {
+        Id : int
         PlayerA : PlayerIdentifier
         PlayerB : PlayerIdentifier
         MatchDate : DateTime option
         Challenged : UserAction
     }
-
+    
+    [<CLIMutable>]
     type AcceptedMatch = {
+        Id : int
         PlayerA : PlayerIdentifier
         PlayerB : PlayerIdentifier
         MatchDate : DateTime
         Challenged : UserAction
         Accepted : UserAction
     }
-
+    
+    [<CLIMutable>]
     type UnverifiedMatch = {
+        Id : int
         PlayerA : PlayerIdentifier
         PlayerB : PlayerIdentifier
         MatchDate : DateTime
@@ -55,8 +62,10 @@ module Matches =
         GameResults : GameResult list
         Submitted : UserAction
     }
-
+    
+    [<CLIMutable>]
     type CompletedMatch = {
+        Id : int
         PlayerA : PlayerIdentifier
         PlayerB : PlayerIdentifier
         MatchDate : DateTime
@@ -74,3 +83,9 @@ module Matches =
         | Accepted of AcceptedMatch
         | Unverified of UnverifiedMatch
         | Completed of CompletedMatch
+
+    let retrieveMatchIdentifier = 
+        function | Proposed record -> record.Id
+                 | Accepted record -> record.Id
+                 | Unverified record -> record.Id
+                 | Completed record -> record.Id

@@ -24,8 +24,8 @@
     foosLadderServices.factory('ScoreService', ["$http", function ($http) {
         var service = {};
         var players = [];
-        service.post = function (data) {
-            return $http.post("http://localhost:48210/api/scores", data);
+        service.postCompletedMatch = function (data) {
+            return $http.post("http://localhost:48210/api/matches/completed", data, { headers: { 'Content-Type': 'application/json' } });
         };
 
         return service;

@@ -87,13 +87,15 @@ module MockMatch =
     open System
 
     let generateDate seconds = DateTime.Now.AddSeconds(float -seconds)
-    let generateScore wins loses = wins, loses
+    let generateScore index wins loses : GameResult = { Index = index; TeamA = wins; TeamB = loses }
     
+    let generateMatchIds() = Gen.choose(0,10)
     let generateDates() = Gen.map generateDate (Gen.choose(0,1000))
-    let generateScores() = Gen.map2 generateScore (Gen.choose(0,1000)) (Gen.choose(0,1000))
+    let generateScores() = Gen.map3 generateScore (Gen.choose(0,5)) (Gen.choose(0,5)) (Gen.choose(0,5))
 
-    let createMatch gameScores playerA playerB dateA dateB = 
-        Match.Completed { 
+    let createMatch gameScores id playerA playerB dateA dateB = 
+        Match.Completed {
+            Id = id
             PlayerA = playerA
             PlayerB = playerB
             MatchDate = dateA
@@ -109,7 +111,7 @@ module MockMatch =
     let generateMatch = 
         let gameScores = FsCheck.Gen.sample 0 5 (generateScores()) 
         let createMatchWithScores = (createMatch gameScores)
-        Gen.map4 createMatchWithScores (MockPlayers.generatePlayerIds()) (MockPlayers.generatePlayerIds()) (generateDates()) (generateDates())
+        Gen.map5 createMatchWithScores (generateMatchIds()) (MockPlayers.generatePlayerIds()) (MockPlayers.generatePlayerIds()) (generateDates()) (generateDates())
 
     let generateRandomMatches size count =
         let data = FsCheck.Gen.sample size count generateMatch  

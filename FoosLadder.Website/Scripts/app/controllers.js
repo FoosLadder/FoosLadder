@@ -22,21 +22,39 @@
             activate();
 
             function activate() {
-                $scope.teamA = { name: "Your name" };
-                $scope.teamB = { name: "" };
+                $scope.teamA = { name: "Your name", id: 2 };
+                $scope.teamB = { name: "", id: 3 };
 
                 $scope.games = [1, 2, 3, 4, 5].map(function(index) {
-                    return { gameIndex: index, caption: 'Game ' + index, scores: { teamA: null, teamB: null } };
+                    return { index: index, caption: 'Game ' + index, teamA: null, teamB: null };
                 });
             }
 
             function submit() {
-                var result = { otherPlayer: $scope.teamB.name, scores: $scope.games };
-                scoreService.post({
-                    otherPlayer: $scope.teamB.name,
-                    scores: $scope.games
-                }).success(function (data, status) {
-                    reset();
+                var timestamp = new Date();
+                var challengedBy = 2;
+                var acceptedBy = 2;
+
+                var winner = $scope.teamA.id;
+                var loser = $scope.teamB.id;
+
+                var result = {
+                    playerA: $scope.teamA.id,
+                    playerBs: $scope.teamB.id,
+                    matchDate: timestamp,
+                    challenged: { by: challengedBy, at: timestamp },
+                    accepted: { by: acceptedBy, at: timestamp },
+                    gameResults: $scope.games,
+                    submitted: { by: $scope.teamA.id, at: timestamp },
+                    verified: { by: $scope.teamA.id, at: timestamp },
+                    winner: winner,
+                    loser: loser
+
+                }
+
+
+                scoreService.postCompletedMatch(result).success(function (data, status) {
+                    debugger;
                 }).error(function (data, status) {
                     alert("Failed!");
                 });

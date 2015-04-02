@@ -41,8 +41,14 @@ type Startup() =
         config.MapHttpAttributeRoutes()
         // Configure serialization
         config.Formatters.XmlFormatter.UseXmlSerializer <- true
-        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.DefaultContractResolver
-                                                                                   ()
+        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver
+                                                                                   ()                                                                        
+        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error                                         
+        config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
+            let context = System.Web.HttpContext.Current
+            let error = errorEvent.ErrorContext.Error
+            context.AddError(error)
+            errorEvent.ErrorContext.Handled <- true)
 #if DEBUG
         (*For pretty printing a browser (User browse only) request, I.e. attempting to navigate to: http://localhost:48210/api/players
         Calling the api from code will give the normal unformatted json. *)
