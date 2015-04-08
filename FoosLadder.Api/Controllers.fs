@@ -1,6 +1,7 @@
 namespace FoosLadder.Api.Controllers
 
 open System.Net
+open System.Web
 open System.Net.Http
 open System.Web.Http
 
@@ -10,17 +11,16 @@ open FoosLadder.Api.Repositories
 
 module Helpers =
 
-    let validateDTOs dtos =
-        let context = System.Web.HttpContext.Current
+    let validateDTOs (context : HttpContext)  =
         match context.AllErrors = null with
-        | true -> Success dtos
+        | true -> Success context
         | false ->
             let dtoErrors = context.AllErrors |> Array.filter (fun error ->
                 match error with 
                 | :? Newtonsoft.Json.JsonSerializationException -> true
                 | _ -> false ) |> Array.toSeq
             match dtoErrors |> Seq.isEmpty with
-            | true -> Success dtos
+            | true -> Success context
             | false -> Failure <| ErrorMessage.DtoValidationError dtoErrors
 
 module Players =
@@ -46,10 +46,10 @@ module Players =
         
         [<Route("")>]
         member this.Post([<FromBody>] player : Player) = 
-            let result =
-                validateDTOs
-                |> bind <| succeed player
-                |> bind PlayerDbContext.Store
+            let result = 
+                match validateDTOs HttpContext.Current with
+                | Success _ -> PlayerDbContext.Store player
+                | Failure failureMessage -> Failure failureMessage
             match result with
             | Success record -> this.Request.CreateResponse(record.Id)
             | Failure _ -> this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "")
@@ -77,11 +77,12 @@ module Matches =
     
         [<Route("completed")>]
         [<HttpPost>]
-        member this.PostCompletedMatch([<FromBody>] completedMatch : CompletedMatch) = 
-            let result =
-                validateDTOs
-                |> bind <| succeed (Match.Completed completedMatch)
-                |> bind MatchDbContext.Store
+        member this.PostCompletedMatch([<FromBody>] completedMatch : CompletedMatch) =
+            let temp = 1 
+            let result = 
+                match validateDTOs HttpContext.Current with
+                | Success _ -> MatchDbContext.Store (Match.Completed completedMatch)
+                | Failure failureMessage -> Failure failureMessage
             match result with
             | Success record -> this.Request.CreateResponse(retrieveMatchIdentifier record)
             | Failure _ -> this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "")

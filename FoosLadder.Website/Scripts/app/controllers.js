@@ -40,15 +40,18 @@
 
                 var result = {
                     playerA: $scope.teamA.id,
-                    playerBs: $scope.teamB.id,
+                    playerB: $scope.teamB.id,
                     matchDate: timestamp,
                     challenged: { by: challengedBy, at: timestamp },
                     accepted: { by: acceptedBy, at: timestamp },
-                    gameResults: $scope.games,
+                    gameResults: $scope.games.map(function(game) {
+                        return { index: game.index, teamA: game.teamA, teamB: game.teamB };
+                    }),
                     submitted: { by: $scope.teamA.id, at: timestamp },
                     verified: { by: $scope.teamA.id, at: timestamp },
                     winner: winner,
-                    loser: loser
+                    loser: loser,
+                    id: 11
 
                 }
 
