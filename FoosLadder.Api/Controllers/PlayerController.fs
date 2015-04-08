@@ -6,18 +6,19 @@ open System.Net
 open System.Net.Http
 open System.Web.Http
 
-[<RoutePrefix("api")>]
+[<RoutePrefix("api/players")>]
 type PlayerController() = 
     inherit ApiController()
     
-    let mockPlayers = MockPlayer.generateRandomPlayers 0 10 |> List.toArray
+    let mockPlayers = MockPlayer.generateRandomPlayers 0 5 |> List.toArray
     
-    [<Route("players")>]
+    [<Route("")>]
     member this.Get() = mockPlayers
-    
+
+    [<Route("")>]
     member this.Post([<FromBody>] player : Player) = mockPlayers |> Array.append [| player |]
     
-    [<Route("players/{id}")>]
+    [<Route("{id}")>]
     member this.Get(request : HttpRequestMessage, id : int) = 
         if id >= 0 && mockPlayers.Length > id then 
             request.CreateResponse(mockPlayers.[id])

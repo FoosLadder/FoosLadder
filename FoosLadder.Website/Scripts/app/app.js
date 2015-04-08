@@ -17,7 +17,9 @@
                     controller: 'PlayerListController'
                 })
                 .otherwise({
-                    redirectTo: '/players'
+                    redirectTo: '/', //Note I am explictly choosing the playerlist as the home page, but we probably want to make a proper decision about this. 
+                    templateUrl: 'views/playerList.html',
+                    controller: 'PlayerListController'
                 });
         }
     ]);
