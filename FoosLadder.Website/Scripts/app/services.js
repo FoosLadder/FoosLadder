@@ -1,23 +1,33 @@
 ﻿
+
 (function () {
     'use strict';
     var foosLadderServices = angular.module('foosLadderApp.Services', []);
 
-    foosLadderServices.factory('PlayerService',["$http", "$q", function($http, $q) {
+    foosLadderServices.factory('PlayerService', ["$http", function ($http) {
         var playerService = {};
-
-        //playerService.getAll = function() {
-            
-        //}
-        
-        var playersDefferred;
-        playerService.GetAll = function() {
-            if (playersDefferred === undefined) {
-                playersDefferred = $http.get("http://localhost:48210/api/players");
+        var players = [];
+        playerService.GetAll = function (callback) {
+            if (players.length === 0) {
+                $http.get("http://localhost:48210/api/players").success(function (data) {
+                    players = data;
+                    callback(players);
+                });
+            } else {
+                callback(players);
             }
-            return playersDefferred;
         };
 
         return playerService;
+    }]);
+
+    foosLadderServices.factory('ScoreService', ["$http", function ($http) {
+        var service = {};
+        var players = [];
+        service.postCompletedMatch = function (data) {
+            return $http.post("http://localhost:48210/api/matches/completed", data, { headers: { 'Content-Type': 'application/json' } });
+        };
+
+        return service;
     }]);
 })();

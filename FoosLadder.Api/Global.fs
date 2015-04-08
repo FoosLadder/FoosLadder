@@ -15,7 +15,7 @@ type BundleConfig() =
                         "~/Scripts/app/services.js",
                         "~/Scripts/app/controllers.js"))
         bundles.Add(StyleBundle("~/css/extLibs").Include([|"~/Content/bootstrap.css"|]))
-        bundles.Add(StyleBundle("~/css/app").Include())
+        bundles.Add(StyleBundle("~/css/app").Include([|"~/Content/app/app.css"|]))
 
 type Global() = 
     inherit System.Web.HttpApplication()
