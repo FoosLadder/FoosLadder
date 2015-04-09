@@ -6,7 +6,6 @@ open System.Net.Http
 open System.Web.Http
 
 open FoosLadder.Api.CommonLibrary
-open FoosLadder.Api.CommonLibrary.Rop
 open FoosLadder.Api.Repositories
 
 module Helpers =
@@ -78,7 +77,6 @@ module Matches =
         [<Route("completed")>]
         [<HttpPost>]
         member this.PostCompletedMatch([<FromBody>] completedMatch : CompletedMatch) =
-            let temp = 1 
             let result = 
                 match validateDTOs HttpContext.Current with
                 | Success _ -> MatchDbContext.Store (Match.Completed completedMatch)
