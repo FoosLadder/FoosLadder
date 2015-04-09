@@ -25,10 +25,10 @@
             <tbody>
                 <tr ng-repeat="player in players | filter:query | orderBy:orderProp">
                     <td ng-bind="$index + 1"></td>
-                    <td ng-bind="player.FirstName + ' ' + player.LastName"></td>
-                    <td ng-bind="player.TotalMatchesPlayed"></td>
-                    <td ng-bind="player.TotalMatchesWon"></td>
-                    <td ng-bind="player.TotalMatchesLost"></td>
+                    <td ng-bind="player.firstName + ' ' + player.lastName"></td>
+                    <td ng-bind="player.totalMatchesPlayed"></td>
+                    <td ng-bind="player.totalMatchesWon"></td>
+                    <td ng-bind="player.totalMatchesLost"></td>
                 </tr>
             </tbody>
         </table>

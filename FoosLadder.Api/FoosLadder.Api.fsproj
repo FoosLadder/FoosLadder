@@ -117,9 +117,11 @@
   </Target>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Models\Player.fs" />
-    <Compile Include="MockData\MockPlayer.fs" />
-    <Compile Include="Controllers\PlayerController.fs" />
+    <Compile Include="CommonLibrary.fs" />
+    <Compile Include="DomainTypes.fs" />
+    <Compile Include="MockData.fs" />
+    <Compile Include="Repositories.fs" />
+    <Compile Include="Controllers.fs" />
     <Content Include="Web.config" />
     <Compile Include="Startup.fs" />
     <Compile Include="Global.fs" />
