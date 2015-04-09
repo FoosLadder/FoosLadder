@@ -86,7 +86,7 @@ module MockMatches =
     open System
 
     let generateDate seconds = DateTime.Now.AddSeconds(float -seconds)
-    let generateScore index wins loses : GameResult = { Index = index; TeamA = wins; TeamB = loses }
+    let generateScore index wins loses : GameResult = { Index = index; PlayerA = wins; PlayerB = loses }
     
     let generateDates() = Gen.map generateDate (Gen.choose(0,1000))
     let generateScores() = Gen.map3 generateScore (Gen.choose(0,5)) (Gen.choose(0,5)) (Gen.choose(0,5))

@@ -20,11 +20,11 @@
             activate();
 
             function activate() {
-                $scope.teamA = { name: "Your name", id: 2 };
-                $scope.teamB = { name: "", id: 3 };
+                $scope.playerA = { name: "Your name", id: 2 };
+                $scope.playerB = { name: "", id: 3 };
 
                 $scope.games = [1, 2, 3, 4, 5].map(function(index) {
-                    return { index: index, caption: 'Game ' + index, teamA: null, teamB: null };
+                    return { index: index, caption: 'Game ' + index, playerA: null, playerB: null };
                 });
             }
 
@@ -33,20 +33,20 @@
                 var challengedBy = 2;
                 var acceptedBy = 2;
 
-                var winner = $scope.teamA.id;
-                var loser = $scope.teamB.id;
+                var winner = $scope.playerA.id;
+                var loser = $scope.playerB.id;
 
                 var result = {
-                    playerA: $scope.teamA.id,
-                    playerB: $scope.teamB.id,
+                    playerA: $scope.playerA.id,
+                    playerB: $scope.playerB.id,
                     matchDate: timestamp,
                     challenged: { by: challengedBy, at: timestamp },
                     accepted: { by: acceptedBy, at: timestamp },
                     gameResults: $scope.games.map(function(game) {
-                        return { index: game.index, teamA: game.teamA, teamB: game.teamB };
+                        return { index: game.index, playerA: game.playerA, playerB: game.playerB };
                     }),
-                    submitted: { by: $scope.teamA.id, at: timestamp },
-                    verified: { by: $scope.teamA.id, at: timestamp },
+                    submitted: { by: $scope.playerA.id, at: timestamp },
+                    verified: { by: $scope.playerA.id, at: timestamp },
                     winner: winner,
                     loser: loser,
                     id: 11

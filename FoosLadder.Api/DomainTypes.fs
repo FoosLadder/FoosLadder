@@ -29,8 +29,8 @@ module Matches =
 
     type GameResult =
         {    Index : int
-             TeamA : int
-             TeamB : int }
+             PlayerA : int
+             PlayerB : int }
 
     [<CLIMutable>]
     type ProposedMatch = {
