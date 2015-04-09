@@ -2,18 +2,20 @@
     'use strict';
     var foosLadderServices = angular.module('foosLadderApp.Services', []);
 
-    foosLadderServices.factory('PlayerService', ["$http", function ($http) {
+    foosLadderServices.factory('PlayerService', ["$http","$q", function ($http, $q) {
         var playerService = {};
         var players = [];
-        playerService.GetAll = function (callback) {
+        playerService.GetAll = function () {
+            var deferred = $q.defer();
             if (players.length === 0) {
-                $http.get("http://localhost:48210/api/players").success(function (data) {
+                $http.get("http://localhost:48210/api/players").success(function(data) {
                     players = data;
-                    callback(players);
+                    deferred.resolve(players);
                 });
             } else {
-                callback(players);
+                deferred.resolve(players);
             }
+            return deferred.promise;
         };
 
         return playerService;
