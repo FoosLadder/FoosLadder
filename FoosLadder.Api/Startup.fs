@@ -9,29 +9,21 @@ open System.Web.Cors
 open System.Web.Http
 open System.Web.Http.Cors
 
-type BrowserDebugJsonFormatter() as this = 
-    inherit JsonMediaTypeFormatter()
-    
-    do 
-        this.SupportedMediaTypes.Add(MediaTypeHeaderValue("text/html"))
-        this.SerializerSettings.Formatting <- Formatting.Indented
-    
-    override this.SetDefaultContentHeaders(objectType, headers, mediaType) = 
-        base.SetDefaultContentHeaders(objectType, headers, mediaType)
-        headers.ContentType <- MediaTypeHeaderValue("application/json")
+module private Helpers = 
 
-type ApiCorsPolicyProvider() = 
-    let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
-    do policy.Origins.Add("http://localhost:50441")
-    interface ICorsPolicyProvider with
-        member this.GetCorsPolicyAsync(request, token) = Task.FromResult policy
+    type ApiCorsPolicyProvider() = 
+        let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
+        do policy.Origins.Add("http://localhost:50441")
+        interface ICorsPolicyProvider with
+            member this.GetCorsPolicyAsync(request, token) = Task.FromResult policy
 
-type CorsPolicyFactory() = 
-    let mutable provider = ApiCorsPolicyProvider() :> ICorsPolicyProvider
-    interface ICorsPolicyProviderFactory with
-        member this.GetCorsPolicyProvider(request) = provider
+    type CorsPolicyFactory() = 
+        let mutable provider = ApiCorsPolicyProvider() :> ICorsPolicyProvider
+        interface ICorsPolicyProviderFactory with
+            member this.GetCorsPolicyProvider(request) = provider
 
-[<Sealed>]
+open Helpers
+
 type Startup() = 
 
     let RegisterCorsPolicy(config : HttpConfiguration) = 
@@ -45,21 +37,14 @@ type Startup() =
     
     let RegisterSerializationFormatters(config : HttpConfiguration) = 
         config.Formatters.XmlFormatter.UseXmlSerializer <- true
-        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver
-                                                                                   ()                                                                        
+        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()                                                                        
         config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error                                         
         config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
             let context = System.Web.HttpContext.Current
             let error = errorEvent.ErrorContext.Error
             context.AddError(error)
             errorEvent.ErrorContext.Handled <- true)
-#if DEBUG
-        (*For pretty printing a browser (User browse only) request, I.e. attempting to navigate to: http://localhost:48210/api/players
-        Calling the api from code will give the normal unformatted json. *)
-        config.Formatters.Add(BrowserDebugJsonFormatter())
-#else
         config.Formatters.JsonFormatter.SupportedMediaTypes.Add(MediaTypeHeaderValue("text/html"))
-#endif
         config
 
     let RegisterConfiguration (config : HttpConfiguration) = 
@@ -73,3 +58,6 @@ type Startup() =
     member __.Configuration(app : IAppBuilder) = 
         let configuration = RegisterConfiguration (new HttpConfiguration())
         app.UseWebApi configuration |> ignore
+
+[<assembly: Microsoft.Owin.OwinStartup(typeof<Startup>)>]
+do()

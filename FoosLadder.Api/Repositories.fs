@@ -73,3 +73,4 @@ module MatchDbContext =
     let Load id = Helper.Load records id
     let Store record = Helper.Store records record <| retrieveMatchIdentifier record
     let Update record = Helper.Update records record <| retrieveMatchIdentifier record
+
