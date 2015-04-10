@@ -22,7 +22,11 @@ type BrowserDebugJsonFormatter() as this =
 
 type ApiCorsPolicyProvider() = 
     let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
-    do policy.Origins.Add("http://localhost:50441")
+    do
+        match Infrastructure.GetApplicationSetting "WebRootUrl" with
+        | Some value -> policy.Origins.Add(value)
+        | _ -> ()
+
     interface ICorsPolicyProvider with
         member this.GetCorsPolicyAsync(request, token) = Task.FromResult policy
 

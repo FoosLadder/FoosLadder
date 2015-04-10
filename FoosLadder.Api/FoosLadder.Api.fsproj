@@ -118,6 +118,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="CommonLibrary.fs" />
+    <Compile Include="Infrastructure.fs" />
     <Compile Include="DomainTypes.fs" />
     <Compile Include="MockData.fs" />
     <Compile Include="Repositories.fs" />
@@ -175,6 +176,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
