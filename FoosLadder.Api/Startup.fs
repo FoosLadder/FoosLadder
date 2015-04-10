@@ -36,22 +36,22 @@ type CorsPolicyFactory() =
         member this.GetCorsPolicyProvider(request) = provider
 
 [<Sealed>]
-type Startup() = 
+type Startup() =
 
-    let RegisterCorsPolicy(config : HttpConfiguration) = 
+    let RegisterCorsPolicy(config : HttpConfiguration) =
         config.SetCorsPolicyProviderFactory(CorsPolicyFactory())
         config.EnableCors()
         config
 
-    let RegisterWebApiAttributeRoutes(config : HttpConfiguration) = 
-        config.MapHttpAttributeRoutes()     
-        config 
+    let RegisterWebApiAttributeRoutes(config : HttpConfiguration) =
+        config.MapHttpAttributeRoutes()
+        config
     
     let RegisterSerializationFormatters(config : HttpConfiguration) = 
         config.Formatters.XmlFormatter.UseXmlSerializer <- true
-        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver
-                                                                                   ()                                                                        
-        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error                                         
+        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver ()
+
+        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error
         config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
             let context = System.Web.HttpContext.Current
             let error = errorEvent.ErrorContext.Error
@@ -66,14 +66,14 @@ type Startup() =
 #endif
         config
 
-    let RegisterConfiguration (config : HttpConfiguration) = 
+    let RegisterConfiguration (config : HttpConfiguration) =
         config
-        |> RegisterCorsPolicy 
+        |> RegisterCorsPolicy
         |> RegisterSerializationFormatters
         |> RegisterWebApiAttributeRoutes
-        
-    
+
+
     // Additional Web API settings
-    member __.Configuration(app : IAppBuilder) = 
+    member __.Configuration(app : IAppBuilder) =
         let configuration = RegisterConfiguration (new HttpConfiguration())
         app.UseWebApi configuration |> ignore
