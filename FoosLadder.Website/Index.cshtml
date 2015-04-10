@@ -35,5 +35,9 @@
         <div ng-view class="view-frame"></div>
     </div>
     @Scripts.Render("~/bundles/extLibs","~/bundles/app")
+    <script>
+        var app = angular.module('foosLadderApp');
+        app.value("apiBaseUrl", "@ApplicationViewModel.ApiBaseUrl");
+    </script>
 </body>
 </html>
