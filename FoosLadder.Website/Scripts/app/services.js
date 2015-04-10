@@ -2,13 +2,37 @@
     'use strict';
     var foosLadderServices = angular.module('foosLadderApp.Services', []);
 
-    foosLadderServices.factory('PlayerService', ["$http","$q", function ($http, $q) {
+    function buildUrl(baseUrl, path) {
+        return baseUrl + path;
+    }
+
+    foosLadderServices.factory('UserAccountService', ['$http', '$q', function ($http, $q) {
+        var service = {
+            currentUserDetails: currentUserDetails
+        };
+
+        function currentUserDetails() {
+            var deferred = $q.defer();
+            var userDetails = {
+                fullName: 'My name',
+                userName: 'MyUserName',
+                userId: 1
+            };
+            deferred.resolve(userDetails);
+
+            return deferred.promise;
+        };
+
+        return service;
+    }]);
+
+    foosLadderServices.factory('PlayerService', ['$http', '$q', 'apiBaseUrl', function ($http, $q, apiBaseUrl) {
         var playerService = {};
         var players = [];
         playerService.GetAll = function () {
             var deferred = $q.defer();
             if (players.length === 0) {
-                $http.get("http://localhost:48210/api/players").success(function(data) {
+                $http.get(buildUrl(apiBaseUrl, 'players')).success(function(data) {
                     players = data;
                     deferred.resolve(players);
                 });
@@ -21,10 +45,10 @@
         return playerService;
     }]);
 
-    foosLadderServices.factory('ScoreService', ["$http", function ($http) {
+    foosLadderServices.factory('ScoreService', ['$http', 'apiBaseUrl', function ($http, apiBaseUrl) {
         var scoreService = {};
         scoreService.postCompletedMatch = function (data) {
-            return $http.post("http://localhost:48210/api/matches/completed", data, { headers: { 'Content-Type': 'application/json' } });
+            return $http.post(buildUrl(apiBaseUrl, 'matches/completed'), data, { headers: { 'Content-Type': 'application/json' } });
         };
 
         return scoreService;

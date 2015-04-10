@@ -15,7 +15,10 @@ module private Helpers =
 
     type ApiCorsPolicyProvider() = 
         let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
-        do policy.Origins.Add("http://localhost:50441")
+        do
+            match Infrastructure.GetApplicationSetting "WebRootUrl" with
+            | Some value -> policy.Origins.Add(value)
+            | _ -> ()
         interface ICorsPolicyProvider with
             member this.GetCorsPolicyAsync(request, token) = Task.FromResult policy
 
@@ -63,21 +66,22 @@ open Microsoft.Owin.Security.OAuth
 open Microsoft.Owin
 open System
 
-type Startup() = 
+type Startup() =
 
-    let RegisterCorsPolicy (config : HttpConfiguration) = 
+    let RegisterCorsPolicy(config : HttpConfiguration) =
         config.SetCorsPolicyProviderFactory(CorsPolicyFactory())
         config.EnableCors()
         config
 
-    let RegisterWebApiAttributeRoutes (config : HttpConfiguration) = 
-        config.MapHttpAttributeRoutes()     
-        config 
+    let RegisterWebApiAttributeRoutes(config : HttpConfiguration) =
+        config.MapHttpAttributeRoutes()
+        config
     
     let RegisterSerializationFormatters (config : HttpConfiguration) = 
         config.Formatters.XmlFormatter.UseXmlSerializer <- true
-        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()                                                                        
-        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error                                         
+        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver ()
+
+        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error
         config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
             let context = System.Web.HttpContext.Current
             let error = errorEvent.ErrorContext.Error
@@ -86,9 +90,9 @@ type Startup() =
         config.Formatters.JsonFormatter.SupportedMediaTypes.Add(MediaTypeHeaderValue("text/html"))
         config
 
-    let RegisterConfiguration (config : HttpConfiguration) = 
+    let RegisterConfiguration (config : HttpConfiguration) =
         config
-        |> RegisterCorsPolicy 
+        |> RegisterCorsPolicy
         |> RegisterSerializationFormatters
         |> RegisterWebApiAttributeRoutes
 
@@ -103,7 +107,7 @@ type Startup() =
     let ConfigureAuthentication (app: IAppBuilder) = 
         app.UseOAuthAuthorizationServer(createOAuthOptions())
             .UseOAuthBearerAuthentication(OAuthBearerAuthenticationOptions())
-    member __.Configuration(app : IAppBuilder) = 
+    member __.Configuration(app : IAppBuilder) =
         let configuration = RegisterConfiguration (new HttpConfiguration())
         ConfigureAuthentication app |> ignore
         app.UseWebApi configuration |> ignore

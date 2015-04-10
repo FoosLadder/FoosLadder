@@ -13,51 +13,62 @@
     ]);
 
     foosLadderControllers.controller('SubmitScoresController', [
-        '$scope', 'ScoreService',
-        function ($scope, scoreService) {
+        '$scope', '$location', 'ScoreService', 'UserAccountService',
+        function ($scope, $location, scoreService, userAccountService) {
             $scope.submit = submit;
+            $scope.hasErrorOccured = false;
 
             activate();
 
             function activate() {
-                $scope.teamA = { name: "Your name", id: 2 };
-                $scope.teamB = { name: "", id: 3 };
+
+                $scope.playerA = { name: "", id: null };
+                $scope.playerB = { name: "", id: 3 };
 
                 $scope.games = [1, 2, 3, 4, 5].map(function(index) {
-                    return { index: index, caption: 'Game ' + index, teamA: null, teamB: null };
+                    return { index: index, caption: 'Game ' + index, playerA: null, playerB: null };
+                });
+
+                userAccountService.currentUserDetails().then(function(userDetails) {
+                    $scope.playerA = { name: userDetails.fullName, id: userDetails.userId };
                 });
             }
 
-            function submit() {
-                var timestamp = new Date();
-                var challengedBy = 2;
-                var acceptedBy = 2;
+            function convertToUserAction(player, timestamp) {
+                return { by: player.id, at: timestamp }
+            }
 
-                var winner = $scope.teamA.id;
-                var loser = $scope.teamB.id;
-
-                var result = {
-                    playerA: $scope.teamA.id,
-                    playerB: $scope.teamB.id,
-                    matchDate: timestamp,
-                    challenged: { by: challengedBy, at: timestamp },
-                    accepted: { by: acceptedBy, at: timestamp },
-                    gameResults: $scope.games.map(function(game) {
-                        return { index: game.index, teamA: game.teamA, teamB: game.teamB };
+            function buildMatchRecord(playerA, playerB, winner, loser, matchDate) {
+                return {
+                    playerA: playerA.id,
+                    playerB: playerB.id,
+                    matchDate: matchDate,
+                    challenged: convertToUserAction(playerA, matchDate),
+                    accepted: convertToUserAction(playerA, matchDate),
+                    submitted: convertToUserAction(playerA, matchDate),
+                    verified: convertToUserAction(playerA, matchDate),
+                    gameResults: $scope.games.map(function (game) {
+                        return { index: game.index, playerA: game.playerA, playerB: game.playerB };
                     }),
-                    submitted: { by: $scope.teamA.id, at: timestamp },
-                    verified: { by: $scope.teamA.id, at: timestamp },
-                    winner: winner,
-                    loser: loser,
-                    id: 11
+                    winner: winner.id,
+                    loser: loser.id
+                };
+            }
 
-                }
+            function submit() {
+                $scope.hasErrorOccured = false;
 
+                var timestamp = new Date();
 
-                scoreService.postCompletedMatch(result).success(function (data, status) {
-                    debugger;
+                var winner = $scope.playerA;
+                var loser = $scope.playerB;
+
+                var matchResults = buildMatchRecord($scope.playerA, $scope.playerB, winner, loser, timestamp);
+
+                scoreService.postCompletedMatch(matchResults).success(function (data, status) {
+                    $location.path('/');
                 }).error(function (data, status) {
-                    alert("Failed!");
+                    $scope.hasErrorOccured = true;
                 });
             }
         }
