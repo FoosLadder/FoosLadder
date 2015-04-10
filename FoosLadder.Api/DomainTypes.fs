@@ -40,7 +40,7 @@ module Matches =
         MatchDate : DateTime option
         Challenged : UserAction
     }
-    
+
     [<CLIMutable>]
     type AcceptedMatch = {
         Id : int
@@ -50,7 +50,7 @@ module Matches =
         Challenged : UserAction
         Accepted : UserAction
     }
-    
+
     [<CLIMutable>]
     type UnverifiedMatch = {
         Id : int
@@ -62,7 +62,7 @@ module Matches =
         GameResults : GameResult list
         Submitted : UserAction
     }
-    
+
     [<CLIMutable>]
     type CompletedMatch = {
         Id : int
@@ -78,13 +78,13 @@ module Matches =
         Loser : PlayerIdentifier
     }
 
-    type Match = 
+    type Match =
         | Proposed of ProposedMatch
         | Accepted of AcceptedMatch
         | Unverified of UnverifiedMatch
         | Completed of CompletedMatch
 
-    let retrieveMatchIdentifier = 
+    let retrieveMatchIdentifier =
         function | Proposed record -> record.Id
                  | Accepted record -> record.Id
                  | Unverified record -> record.Id

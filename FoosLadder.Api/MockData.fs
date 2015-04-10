@@ -2,7 +2,7 @@
 
 open FsCheck
 
-module MockPlayers = 
+module MockPlayers =
 
     open FoosLadder.Api.DomainTypes.Players
 
@@ -63,23 +63,23 @@ module MockPlayers =
         "Yousefington";
         "Zeldington"
     ]
-    
+
     let generateFirstName() = Gen.elements possibleFirstNames
     let generateLastName() = Gen.elements possibleLastNames
-    
+
     let generateWins() = Gen.choose(0,1000000)
     let generateLosses() = Gen.choose(0,1000000)
 
-    let createPlayer firstName lastName wins losses = 
+    let createPlayer firstName lastName wins losses =
         {Id = 0; FirstName = firstName; LastName = lastName; TotalMatchesPlayed=wins+losses; TotalMatchesWon = wins; TotalMatchesLost = losses}
 
-    let generatePlayer = 
+    let generatePlayer =
         Gen.map4 createPlayer (generateFirstName()) (generateLastName()) (generateWins()) (generateLosses())
 
     let generateRandomPlayers size count =
-        let data = FsCheck.Gen.sample size count generatePlayer  
+        let data = FsCheck.Gen.sample size count generatePlayer
         data
-    
+
 module MockMatches = 
 
     open FoosLadder.Api.DomainTypes.Matches
@@ -87,33 +87,32 @@ module MockMatches =
 
     let generateDate seconds = DateTime.Now.AddSeconds(float -seconds)
     let generateScore index wins loses : GameResult = { Index = index; PlayerA = wins; PlayerB = loses }
-    
+
     let generateDates() = Gen.map generateDate (Gen.choose(0,1000))
     let generateScores() = Gen.map3 generateScore (Gen.choose(0,5)) (Gen.choose(0,5)) (Gen.choose(0,5))
-    
+
     let generatePlayerIds() = Gen.choose(0,10)
 
-    let createMatch gameScores playerA playerB dateA dateB = 
+    let createMatch gameScores playerA playerB dateA dateB =
         Match.Completed {
             Id = 0
             PlayerA = playerA
             PlayerB = playerB
             MatchDate = dateA
-            Challenged = { By = playerA; At = dateA } 
+            Challenged = { By = playerA; At = dateA }
             Accepted = { By = playerB; At = dateA }
             GameResults = gameScores
-            Submitted = { By = playerA; At = dateB } 
-            Verified = { By = playerB; At = dateB } 
+            Submitted = { By = playerA; At = dateB }
+            Verified = { By = playerB; At = dateB }
             Winner = playerB
             Loser = playerA }
-        
 
-    let generateMatch = 
-        let gameScores = FsCheck.Gen.sample 0 5 (generateScores()) 
+
+    let generateMatch =
+        let gameScores = FsCheck.Gen.sample 0 5 (generateScores())
         let createMatchWithScores = (createMatch gameScores)
         Gen.map4 createMatchWithScores (generatePlayerIds()) (generatePlayerIds()) (generateDates()) (generateDates())
 
     let generateRandomMatches size count =
-        let data = FsCheck.Gen.sample size count generateMatch  
+        let data = FsCheck.Gen.sample size count generateMatch
         data
-    

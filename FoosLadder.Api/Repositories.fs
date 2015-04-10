@@ -14,8 +14,8 @@ module internal Helper =
 
     let LoadAll (records: Dictionary<int, 'b>) =
         records.Values |> Seq.toArray |> Success
-    
-    let Load (records: Dictionary<int, 'b>) id = 
+
+    let Load (records: Dictionary<int, 'b>) id =
         match records.TryGetValue(id) with
         | (false, _) -> Failure <| ErrorMessage.DbIdNotValid id
         | (true, item) -> Success item
@@ -23,7 +23,7 @@ module internal Helper =
     let Update (records: Dictionary<int, 'b>) record id =
         match records.ContainsKey(id) with
         | false -> Failure <| ErrorMessage.DbIdNotValid id
-        | true -> 
+        | true ->
             records.[id] <- record
             Success record
     let Delete (records: Dictionary<int, 'b>) id =
@@ -43,7 +43,7 @@ module PlayerDbContext =
         let players = MockPlayers.generateRandomPlayers 0 10 |> List.toSeq |> Seq.zip <| Seq.initInfinite (fun index -> index)
         for (record, id) in players do
             records.Add(id, updateId id record)
-    
+
     let Delete id = Helper.Delete records id
     let LoadAll () = Helper.LoadAll records
     let Load id = Helper.Load records id

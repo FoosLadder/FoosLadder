@@ -1,5 +1,5 @@
 namespace FoosLadder.Api.CommonLibrary
-    
+
 type Result<'TSuccess,'TFailure> = 
 | Success of 'TSuccess
 | Failure of 'TFailure
@@ -15,4 +15,3 @@ module Rop =
         | Failure f -> Failure f
 
     let succeed x = Success x
-
