@@ -48,7 +48,33 @@ type AccountController() as this=
             this.repo.Dispose() |> ignore
         base.Dispose(disposing) |> ignore
 
- 
+module TestOrders = 
+    //TODO This is a test. Remove it when complete. 
+
+    [<CLIMutable>]
+    type Order = {
+        OrderID : int
+        CustomerName : string
+        City : string
+        IsShipped : bool
+    }
+
+    let createOrders() = [
+        {OrderID = 1; CustomerName = "Bob"; City="York"; IsShipped=true}
+        {OrderID = 2; CustomerName = "Henry"; City="Dover"; IsShipped=false}
+    ]
+
+    [<RoutePrefix("api/Orders")>]
+    type OrdersController() = 
+        inherit ApiController()
+
+        [<Authorize>]
+        [<Route("")>]
+        member this.Get() = 
+            this.Ok(createOrders())
+
+
+
 
         
             

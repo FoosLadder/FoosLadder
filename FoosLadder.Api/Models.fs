@@ -2,6 +2,7 @@
 
 open System.ComponentModel.DataAnnotations
     
+//TODO merge with DomainTypes or rename and merge
 [<CLIMutable>]
 type UserModel = {
     [<Required>]
