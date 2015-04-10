@@ -11,7 +11,8 @@ type Global() =
         bundles.Add(ScriptBundle("~/bundles/extLibs").Include(
                         "~/Scripts/angular.js", 
                         "~/Scripts/angular-route.js", 
-                        "~/Scripts/angular-resource.js"))
+                        "~/Scripts/angular-resource.js",
+                        "~/Scripts/loading-bar.js"))
         bundles.Add(ScriptBundle("~/bundles/app").Include(
                         "~/Scripts/app/app.js",
                         "~/Scripts/app/services.js",
@@ -22,7 +23,6 @@ type Global() =
     let RegisterGlobalFilters (filters:GlobalFilterCollection) =
         filters.Add(new HandleErrorAttribute())
 
-    member this.Start() = 
-        //GlobalConfiguration.Configure(WebApiConfig.Register)
+    member __.Start() = 
         RegisterGlobalFilters GlobalFilters.Filters
         RegisterBundles BundleTable.Bundles

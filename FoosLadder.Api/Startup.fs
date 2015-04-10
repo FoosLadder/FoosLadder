@@ -10,8 +10,7 @@ open System.Web.Http
 open System.Web.Http.Cors
 open System.Security.Claims
 
-//TODO Rename to ConfigHelpers and move the functions into it
-module private Helpers = 
+module private ConfigurationHelpers = 
 
     type ApiCorsPolicyProvider() = 
         let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
@@ -27,12 +26,40 @@ module private Helpers =
         interface ICorsPolicyProviderFactory with
             member this.GetCorsPolicyProvider(request) = provider
 
+    let ConfigureCorsPolicy(config : HttpConfiguration) =
+        config.SetCorsPolicyProviderFactory(CorsPolicyFactory())
+        config.EnableCors()
+        config
+
+    let ConfigureWebApiAttributeRoutes(config : HttpConfiguration) =
+        config.MapHttpAttributeRoutes()
+        config
+    
+    let ConfigureSerializationFormatters (config : HttpConfiguration) = 
+        config.Formatters.XmlFormatter.UseXmlSerializer <- true
+        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver ()
+
+        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error
+        config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
+            let context = System.Web.HttpContext.Current
+            let error = errorEvent.ErrorContext.Error
+            context.AddError(error)
+            errorEvent.ErrorContext.Handled <- true)
+        config.Formatters.JsonFormatter.SupportedMediaTypes.Add(MediaTypeHeaderValue("text/html"))
+        config
+
+    let RegisterConfiguration (config : HttpConfiguration) =
+        config
+        |> ConfigureCorsPolicy
+        |> ConfigureSerializationFormatters
+        |> ConfigureWebApiAttributeRoutes
+
 module private AuthenticationHelpers = 
     open Microsoft.Owin.Security.OAuth
     open FoosLadder.Api.Repositories
+    open Microsoft.Owin
+    open System
 
-
-    
     //TODO Rename after completing tut
     type SimpleAuthorizationServerProvider() = 
         inherit OAuthAuthorizationServerProvider()
@@ -57,48 +84,9 @@ module private AuthenticationHelpers =
             } 
             Task.Factory.StartNew(fun () -> asyncWork |> Async.RunSynchronously)
             
-            
-    
-
-open Helpers
-open AuthenticationHelpers
-open Microsoft.Owin.Security.OAuth
-open Microsoft.Owin
-open System
-
-type Startup() =
-
-    let RegisterCorsPolicy(config : HttpConfiguration) =
-        config.SetCorsPolicyProviderFactory(CorsPolicyFactory())
-        config.EnableCors()
-        config
-
-    let RegisterWebApiAttributeRoutes(config : HttpConfiguration) =
-        config.MapHttpAttributeRoutes()
-        config
-    
-    let RegisterSerializationFormatters (config : HttpConfiguration) = 
-        config.Formatters.XmlFormatter.UseXmlSerializer <- true
-        config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver ()
-
-        config.Formatters.JsonFormatter.SerializerSettings.MissingMemberHandling <- MissingMemberHandling.Error
-        config.Formatters.JsonFormatter.SerializerSettings.Error <- new System.EventHandler<Serialization.ErrorEventArgs>(fun _ errorEvent ->
-            let context = System.Web.HttpContext.Current
-            let error = errorEvent.ErrorContext.Error
-            context.AddError(error)
-            errorEvent.ErrorContext.Handled <- true)
-        config.Formatters.JsonFormatter.SupportedMediaTypes.Add(MediaTypeHeaderValue("text/html"))
-        config
-
-    let RegisterConfiguration (config : HttpConfiguration) =
-        config
-        |> RegisterCorsPolicy
-        |> RegisterSerializationFormatters
-        |> RegisterWebApiAttributeRoutes
-
     let createOAuthOptions() = 
         new OAuthAuthorizationServerOptions(
-            TokenEndpointPath = PathString("/Token"),
+            TokenEndpointPath = PathString("api/token"),
             //AuthorizeEndpointPath = new PathString("/Account/Authorize"),
             Provider = new SimpleAuthorizationServerProvider(),
             AccessTokenExpireTimeSpan = TimeSpan.FromDays(1.0),
@@ -107,6 +95,13 @@ type Startup() =
     let ConfigureAuthentication (app: IAppBuilder) = 
         app.UseOAuthAuthorizationServer(createOAuthOptions())
             .UseOAuthBearerAuthentication(OAuthBearerAuthenticationOptions())
+    
+
+open ConfigurationHelpers
+open AuthenticationHelpers
+
+type Startup() =
+
     member __.Configuration(app : IAppBuilder) =
         let configuration = RegisterConfiguration (new HttpConfiguration())
         ConfigureAuthentication app |> ignore

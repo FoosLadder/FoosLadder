@@ -2,10 +2,24 @@
     'use strict';
     var foosLadderControllers = angular.module('foosLadderApp.Controllers', []);
 
+    foosLadderControllers.controller('indexController', ['$scope', '$location', "AuthService", function ($scope, $location, authService) {
+
+        $scope.logOut = function () {
+            authService.logOut();
+            $location.path('/players');
+        }
+
+        $scope.authentication = authService.authentication;
+        //$scope.authentication = {
+        //    userName : "Xena",
+        //    isAuth : true
+        //}
+    }]);
+
     foosLadderControllers.controller('PlayerListController', [
         '$scope', 'PlayerService',
         function ($scope, playerService) {
-            playerService.GetAll().then(function(data) {
+            playerService.getAll().then(function(data) {
                 $scope.players = data;
                 $scope.orderProp = '-totalMatchesWon';
             });
