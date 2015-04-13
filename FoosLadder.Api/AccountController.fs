@@ -55,13 +55,13 @@ module TestOrders =
     type Order = {
         OrderID : int
         CustomerName : string
-        City : string
+        ShipperCity : string
         IsShipped : bool
     }
 
     let createOrders() = [
-        {OrderID = 1; CustomerName = "Bob"; City="York"; IsShipped=true}
-        {OrderID = 2; CustomerName = "Henry"; City="Dover"; IsShipped=false}
+        {OrderID = 1; CustomerName = "Bob"; ShipperCity="York"; IsShipped=true}
+        {OrderID = 2; CustomerName = "Henry"; ShipperCity="Dover"; IsShipped=false}
     ]
 
     [<RoutePrefix("api/Orders")>]

@@ -13,17 +13,17 @@
         function ($routeProvider) {
             $routeProvider.when("/login", {
                 templateUrl: "views/login.html",
-                controller: "loginController"
+                controller: "LoginController"
             });
 
             $routeProvider.when("/signup", {
                 templateUrl: "views/signup.html",
-                controller: "signupController"
+                controller: "SignupController"
             });
 
             $routeProvider.when("/orders", {
                 templateUrl: "views/orders.html",
-                controller: "ordersController"
+                controller: "OrdersController"
             });
 
             $routeProvider.when('/players', {
@@ -41,6 +41,10 @@
             });
         }
     ]);
+
+    foosLadderApp.config(['$httpProvider', function ($httpProvider) {
+        $httpProvider.interceptors.push('AuthInterceptorService');
+    }])
 
     foosLadderApp.run(['AuthService', function (authService) {
         authService.fillAuthData();

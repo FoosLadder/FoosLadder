@@ -12,7 +12,7 @@
     @Styles.Render("~/css/app")
 </head>
 <body>
-    <nav class="navbar navbar-default" role="navigation" data-ng-controller="indexController">
+    <nav class="navbar navbar-default" role="navigation" data-ng-controller="IndexController">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -22,11 +22,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">@ApplicationViewModel.ApplicationName</a>
+                <a class="navbar-brand" href="#/">@ApplicationViewModel.ApplicationName</a>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li data-ng-hide="!authentication.isAuth"><a href="#">Hello {{authentication.userName}}</a></li>
+                    <li data-ng-hide="!authentication.isAuth"><a href="#/">Hello {{authentication.userName}}</a></li>
                     <li data-ng-hide="!authentication.isAuth"><a href="#/scores/submit">Submit My Scores</a></li>
                     <li data-ng-hide="!authentication.isAuth"><a href="#/orders">My Orders</a></li>
                     <li data-ng-hide="!authentication.isAuth"><a href="#/refresh">Refresh Token</a></li>

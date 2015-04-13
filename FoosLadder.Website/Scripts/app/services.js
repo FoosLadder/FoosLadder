@@ -55,6 +55,18 @@
         return scoreService;
     }]);
 
+    foosLadderServices.factory('OrdersService', ['$http', 'apiBaseUrl', function ($http, apiBaseUrl) {
+        function getOrders() {
+            return $http.get(buildUrl(apiBaseUrl, 'orders')).then(function (results) {
+                return results;
+            });
+        }
+
+        return {
+            getOrders : getOrders
+        }
+    }]);
+
     foosLadderServices.factory('AuthService', ['$http', '$q', 'localStorageService', 'apiBaseUrl', function ($http, $q, localStorageService, apiBaseUrl) {
         var authentication = {
             isAuth: false,
@@ -115,4 +127,34 @@
         }
 
     }]);
+
+    foosLadderServices.factory('AuthInterceptorService', ['$q', '$location', 'localStorageService', function ($q, $location, localStorageService) {
+
+        function request(config) {
+            config.headers = config.headers || {};
+
+            var authData = localStorageService.get('authorizationData');
+            if (authData) {
+                config.headers.Authorization = 'Bearer ' + authData.token;
+            }
+
+            return config;
+        }
+
+        function responseError(rejection) {
+            if (rejection.status === 401) {
+                $location.path('/login');
+            }
+            return $q.reject(rejection);
+        }
+
+        return {
+            request: request,
+            responseError : responseError
+        }
+
+
+    }]);
+
+
 })();

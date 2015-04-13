@@ -86,7 +86,7 @@ module private AuthenticationHelpers =
             
     let createOAuthOptions() = 
         new OAuthAuthorizationServerOptions(
-            TokenEndpointPath = PathString("api/token"),
+            TokenEndpointPath = PathString("/api/token"),
             //AuthorizeEndpointPath = new PathString("/Account/Authorize"),
             Provider = new SimpleAuthorizationServerProvider(),
             AccessTokenExpireTimeSpan = TimeSpan.FromDays(1.0),
