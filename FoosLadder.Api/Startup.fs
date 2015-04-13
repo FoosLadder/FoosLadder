@@ -1,5 +1,7 @@
 namespace FoosLadder.Api
 
+open FoosLadder.Api.Infrastructure
+
 open Newtonsoft.Json
 open Owin
 open System.Net.Http.Formatting
@@ -16,7 +18,7 @@ module private Helpers =
     type ApiCorsPolicyProvider() = 
         let mutable policy = CorsPolicy(AllowAnyMethod = true, AllowAnyHeader = true)
         do
-            match Infrastructure.GetApplicationSetting "WebRootUrl" with
+            match Configuration.GetApplicationSetting "WebRootUrl" with
             | Some value -> policy.Origins.Add(value)
             | _ -> ()
         interface ICorsPolicyProvider with

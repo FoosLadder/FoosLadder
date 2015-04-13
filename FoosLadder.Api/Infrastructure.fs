@@ -1,6 +1,6 @@
-namespace FoosLadder.Api
+namespace FoosLadder.Api.Infrastructure
 
-module Infrastructure =
+module Configuration =
 
     let GetApplicationSetting (setting : string) =
         let appSetting = System.Configuration.ConfigurationManager.AppSettings
