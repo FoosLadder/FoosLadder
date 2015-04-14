@@ -73,8 +73,8 @@ module MatchRepository =
             PlayerA = model.PlayerA
             PlayerB = model.PlayerB }
     
-    let internal toDomainType model =
-        let { MatchState = state } = model;
+    let internal toDomainType (model : DatabaseMatch) =
+        let state = model.MatchState;
         match state with
         | 1 ->
             defined {
@@ -157,12 +157,13 @@ module MatchRepository =
         | value -> Failure <| InvalidateMatchType value
 
     let internal gameToDatabaseModel matchRecord (record : GameResult) =
-        {    GameResultId = record.Id
-             Match = matchRecord
-             MatchId = record.Id
-             Index = record.Index
-             PlayerA = record.PlayerA
-             PlayerB = record.PlayerB }
+         DatabaseGameResult(
+             GameResultId = record.Id,
+             Match = matchRecord,
+             MatchId = record.Id,
+             Index = record.Index,
+             PlayerA = record.PlayerA,
+             PlayerB = record.PlayerB)
        
     let internal toDatabaseModel record =
         let rec toProposedMatch = function
@@ -170,48 +171,42 @@ module MatchRepository =
             | record -> toProposedMatch <| previousMatchState record
 
         let proposedMatch = toProposedMatch record
-        let initialModel = {
-                MatchId = proposedMatch.Id
-                PlayerA = proposedMatch.PlayerA
-                PlayerB = proposedMatch.PlayerB
-                MatchDate = proposedMatch.MatchDate |> toNullable
-                ChallengedBy = proposedMatch.Challenged.By |> toNullableValue
-                ChallengedAt = proposedMatch.Challenged.At |> toNullableValue
-                AcceptedBy = None |> toNullable
-                AcceptedAt = None |> toNullable
-                GameResults = [||] :> ICollection<DatabaseGameResult>
-                SubmittedBy = None |> toNullable
-                SubmittedAt = None |> toNullable
-                VerifiedBy = None |> toNullable
-                VerifiedAt = None |> toNullable
-                Winner = None |> toNullable
-                Loser = None |> toNullable
-                MatchState = 0 }
+        let initialModel = 
+            DatabaseMatch(
+                MatchId = proposedMatch.Id,
+                PlayerA = proposedMatch.PlayerA,
+                PlayerB = proposedMatch.PlayerB,
+                MatchDate = (proposedMatch.MatchDate |> toNullable),
+                ChallengedBy = (proposedMatch.Challenged.By |> toNullableValue),
+                ChallengedAt = (proposedMatch.Challenged.At |> toNullableValue),
+                MatchState = 0)
 
-        let rec updateModel model record =
+        let rec updateModel (model: DatabaseMatch) record =
             match record with
-            | Match.Proposed _ -> { model with MatchState = 1 }
+            | Match.Proposed _ ->
+                model.MatchState <- 1
+                model
             | Match.Accepted m -> 
                 let updatedModel = previousMatchState record |> updateModel model
-                { updatedModel with
-                    AcceptedBy = m.Accepted.By |> toNullableValue
-                    AcceptedAt = m.Accepted.At |> toNullableValue
-                    MatchState = 2 }
+                model.AcceptedBy <- m.Accepted.By |> toNullableValue
+                model.AcceptedAt <- m.Accepted.At |> toNullableValue
+                model.MatchState <- 2
+                model
             | Match.Unverified m -> 
                 let updatedModel = previousMatchState record |> updateModel model
-                { updatedModel with
-                    GameResults = (m.GameResults |> List.map (gameToDatabaseModel model) |> List.toArray) :> ICollection<DatabaseGameResult>
-                    SubmittedBy = m.Submitted.By |> toNullableValue
-                    SubmittedAt = m.Submitted.At |> toNullableValue
-                    MatchState = 3 }
+                model.GameResults <- (m.GameResults |> List.map (gameToDatabaseModel model) |> List.toArray) :> ICollection<DatabaseGameResult>
+                model.SubmittedBy <- m.Submitted.By |> toNullableValue
+                model.SubmittedAt <- m.Submitted.At |> toNullableValue
+                model.MatchState <- 3
+                model
             | Match.Completed m -> 
                 let updatedModel = previousMatchState record |> updateModel model
-                { updatedModel with
-                    VerifiedBy = m.Verified.By |> toNullableValue
-                    VerifiedAt = m.Verified.At |> toNullableValue
-                    Winner = m.Winner |> toNullableValue
-                    Loser = m.Loser |> toNullableValue
-                    MatchState = 4 }
+                model.VerifiedBy <- m.Verified.By |> toNullableValue
+                model.VerifiedAt <- m.Verified.At |> toNullableValue
+                model.Winner <- m.Winner |> toNullableValue
+                model.Loser <- m.Loser |> toNullableValue
+                model.MatchState <- 4
+                model
         updateModel initialModel record
 
     let GetAll () =
