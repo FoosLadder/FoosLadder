@@ -64,22 +64,16 @@ module Matches =
 
         [<Route("")>]
         member this.Get() =
-            match MatchDbContext.LoadAll () with
+            match MatchRepository.GetAll () with
             | Success records -> this.Ok(records)
-            | Failure _ -> this.Ok([||])
-
-        [<Route("{id}")>]
-        member this.Get(id : int) =
-            match MatchDbContext.Load id with
-            | Success records -> this.Ok(records) :> IHttpActionResult
-            | Failure _ -> this.NotFound() :> IHttpActionResult
+            | Failure _ -> this.Ok([])
 
         [<Route("completed")>]
         [<HttpPost>]
         member this.PostCompletedMatch([<FromBody>] completedMatch : CompletedMatch) =
             let result =
                 match validateDTOs HttpContext.Current with
-                | Success _ -> MatchDbContext.Store (Match.Completed completedMatch)
+                | Success _ -> MatchRepository.AddNew (Match.Completed completedMatch)
                 | Failure failureMessage -> Failure failureMessage
             match result with
             | Success record -> this.Request.CreateResponse(retrieveMatchIdentifier record)

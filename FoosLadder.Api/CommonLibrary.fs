@@ -7,6 +7,8 @@ type Result<'TSuccess,'TFailure> =
 type ErrorMessage = 
     | DbIdNotValid of int
     | DtoValidationError of exn seq
+    | PropertyUndefined of string
+    | InvalidateMatchType of int
 
 module Rop =
     let bind track input =

@@ -27,8 +27,10 @@ module Matches =
     open Actions
     open Players
 
+    [<CLIMutable>]
     type GameResult =
-        {    Index : int
+        {    Id : int
+             Index : int
              PlayerA : int
              PlayerB : int }
 
@@ -89,3 +91,31 @@ module Matches =
                  | Accepted record -> record.Id
                  | Unverified record -> record.Id
                  | Completed record -> record.Id
+
+    let previousMatchState =
+        function | Proposed record -> Proposed record
+                 | Accepted record ->
+                     Proposed {
+                         Id = record.Id
+                         PlayerA = record.PlayerA
+                         PlayerB = record.PlayerB
+                         MatchDate = Some record.MatchDate
+                         Challenged = { By = record.Challenged.By; At = record.Challenged.At } }
+                 | Unverified record ->
+                     Accepted {
+                         Id = record.Id
+                         PlayerA = record.PlayerA
+                         PlayerB = record.PlayerB
+                         MatchDate = record.MatchDate
+                         Challenged = { By = record.Challenged.By; At = record.Challenged.At }
+                         Accepted = { By = record.Challenged.By; At = record.Challenged.At } }
+                 | Completed record ->
+                     Unverified {
+                         Id = record.Id
+                         PlayerA = record.PlayerA
+                         PlayerB = record.PlayerB
+                         MatchDate = record.MatchDate
+                         Challenged = { By = record.Challenged.By; At = record.Challenged.At }
+                         Accepted = { By = record.Challenged.By; At = record.Challenged.At }
+                         GameResults = record.GameResults
+                         Submitted = { By = record.Challenged.By; At = record.Challenged.At } }
