@@ -120,11 +120,13 @@
     <Compile Include="CommonLibrary.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="Models.fs" />
+    <Compile Include="Entities.fs" />
     <Compile Include="DomainTypes.fs" />
     <Compile Include="MockData.fs" />
     <Compile Include="Repositories.fs" />
     <Compile Include="AuthContext.fs" />
     <Compile Include="AuthRepository.fs" />
+    <Compile Include="RefreshTokensController.fs" />
     <Compile Include="AccountController.fs" />
     <Compile Include="Controllers.fs" />
     <Compile Include="Startup.fs" />

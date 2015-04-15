@@ -36,14 +36,14 @@ type AccountController() as this=
         if not this.ModelState.IsValid then
             this.BadRequest(this.ModelState : ModelBinding.ModelStateDictionary) :> IHttpActionResult
         else 
-            let result = this.repo.RegisterUser(userModel) |> Async.RunSynchronously
+            let result = this.repo.RegisterUser userModel |> Async.RunSynchronously
             let errorResult = this.GetErrorResult(result) 
             if errorResult <> null then
                 errorResult
             else
                 this.Ok() :> IHttpActionResult
        
-    override x.Dispose(disposing : bool) = 
+    override __.Dispose(disposing : bool) = 
         if disposing then
             this.repo.Dispose() |> ignore
         base.Dispose(disposing) |> ignore
