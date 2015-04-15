@@ -36,6 +36,17 @@
                 controller: 'SubmitScoresController'
             });
 
+            //$routeProvider.when("/refresh", {
+            //    templateUrl: "/app/views/refresh.html",
+            //    controller: "refreshController"
+            //});
+
+            //$routeProvider.when("/tokens", {
+            //    templateUrl: "/app/views/tokens.html",
+            //    controller: "tokensManagerController"
+            //});
+
+
             $routeProvider.otherwise({
                 redirectTo: '/players'
             });

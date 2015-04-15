@@ -22,10 +22,11 @@ type RefreshTokensController() as this =
 
 
 
-    [<Authorize(Users="Admin")>]
+    //[<Authorize(Users="Admin")>]
+    [<AllowAnonymous>]
     [<Route("")>]
     member __.Delete (tokenId : string)= 
-        //[<AllowAnonymous>]
+
         let result = this.repo.RemoveRefreshToken tokenId |> Async.RunSynchronously
         if result then
             this.Ok() :> IHttpActionResult
