@@ -20,6 +20,33 @@ type UserModel = {
     ConfirmPassword : string
 }
 
+[<CLIMutable>]
+type ExternalLoginViewModel = {
+    Name : string
+    Url : string
+    State : string
+}
+
+[<CLIMutable>]
+type RegisterExternalBindingModel = {
+    [<Required>]
+    UserName : string
+
+    [<Required>]
+    Provider : string
+
+    [<Required>]
+    ExternalAccessToken : string
+}
+
+[<CLIMutable>]
+type ParsedExternalAccessToken = {
+    user_id : string
+    app_id : string
+}
+
+    
+
 type ApplicationTypes =
     | JavaScript = 0
     | NativeConfidential = 1

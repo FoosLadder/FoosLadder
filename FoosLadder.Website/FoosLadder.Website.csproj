@@ -123,9 +123,11 @@
     <Content Include="Scripts\loading-bar.min.js" />
     <Content Include="Views\login.html" />
     <Content Include="Views\orders.html" />
+    <Content Include="Views\refresh.html" />
     <Content Include="Views\signUp.html" />
     <Content Include="Views\submitScores.html" />
     <Content Include="Views\playerList.html" />
+    <Content Include="Views\tokens.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

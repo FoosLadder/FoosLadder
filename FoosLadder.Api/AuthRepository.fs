@@ -32,7 +32,26 @@ type AuthRepository() as this =
             return! user
         }
     
+    //TODO If Nothing C# is calling this method, it can return  Client option
     member __.FindClient (clientId : string) = this.context.Clients.Find(clientId)
+
+    member __.FindAsync loginInfo = 
+        async {
+            let user = this.userManager.FindAsync loginInfo |> Async.AwaitTask
+            return! user
+        }
+
+    member __.CreateAsync user =
+        async {
+            let result = this.userManager.CreateAsync user |> Async.AwaitTask
+            return! result
+        }
+
+    member __.AddLoginAsync userId login = 
+        async {
+            let result = this.userManager.AddLoginAsync(userId, login) |> Async.AwaitTask
+            return! result
+        }
 
     member __.RemoveRefreshToken (refreshToken : RefreshToken) =
         async {

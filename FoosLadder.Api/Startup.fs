@@ -64,12 +64,28 @@ module private AuthenticationHelpers =
     open Microsoft.Owin.Security
     open System.Collections.Generic
     open Microsoft.Owin.Security.Infrastructure
+    open Microsoft.Owin.Security.Google
 
     let getHash (input : string) = 
         let hashAlgorithm = new SHA256CryptoServiceProvider()
         let byteValue = System.Text.Encoding.UTF8.GetBytes(input)
         let byteHash = hashAlgorithm.ComputeHash(byteValue)
         Convert.ToBase64String byteHash
+
+    type GoogleAuthProvider() =
+
+        interface IGoogleOAuth2AuthenticationProvider with
+            member __.ApplyRedirect(context: GoogleOAuth2ApplyRedirectContext): unit = 
+                context.Response.Redirect(context.RedirectUri)
+            
+            member __.Authenticated(context: GoogleOAuth2AuthenticatedContext): Task = 
+                context.Identity.AddClaim(Claim("ExternalAccessToken", context.AccessToken)) 
+                Task.Factory.StartNew(fun () -> ())
+            
+            member __.ReturnEndpoint(context: GoogleOAuth2ReturnEndpointContext): Task = 
+                Task.Factory.StartNew(fun () -> ())
+            
+            
 
     type SimpleRefreshTokenProvider() = 
 
@@ -235,21 +251,44 @@ module private AuthenticationHelpers =
             AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30.0),
             Provider = new SimpleAuthorizationServerProvider(),
             RefreshTokenProvider = new SimpleRefreshTokenProvider()
-            )
+        )
 
-    let ConfigureAuthentication (app: IAppBuilder) = 
+    let createGoogleOAuthOptions() = 
+        GoogleOAuth2AuthenticationOptions(
+            ClientId = "", 
+            ClientSecret = "", 
+            Provider = new GoogleAuthProvider()
+        )
+    let createOAuthBearerOptions() = OAuthBearerAuthenticationOptions()
+        
+
+    let ConfigureAuthentication oAuthBearerOptions (googleAuthOptions :GoogleOAuth2AuthenticationOptions)  (app: IAppBuilder)  = 
+        app.UseExternalSignInCookie(Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ExternalCookie)
+
+
         app.UseOAuthAuthorizationServer(createOAuthOptions())
-            .UseOAuthBearerAuthentication(OAuthBearerAuthenticationOptions())
+            .UseOAuthBearerAuthentication(oAuthBearerOptions)
+            .UseGoogleAuthentication(googleAuthOptions)
     
 
 open ConfigurationHelpers
 open AuthenticationHelpers
 
-type Startup() =
+type Startup()=
+    static let mutable googleAuthOptions = createGoogleOAuthOptions()
+    static let mutable oAuthBearerOptions  = createOAuthBearerOptions()
+
+    static member GoogleAuthOptions
+        with get () = googleAuthOptions
+        and private set value = googleAuthOptions <- value
+
+    static member OAuthBearerOptions
+        with get () = oAuthBearerOptions
+        and private set value = oAuthBearerOptions <- value
 
     member __.Configuration(app : IAppBuilder) =
         let configuration = RegisterConfiguration (new HttpConfiguration())
-        ConfigureAuthentication app |> ignore
+        ConfigureAuthentication oAuthBearerOptions googleAuthOptions app |> ignore
         app.UseWebApi configuration |> ignore
 
 [<assembly: Microsoft.Owin.OwinStartup(typeof<Startup>)>]
