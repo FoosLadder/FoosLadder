@@ -121,6 +121,7 @@
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\loading-bar.js" />
     <Content Include="Scripts\loading-bar.min.js" />
+    <Content Include="Views\associate.html" />
     <Content Include="Views\login.html" />
     <Content Include="Views\orders.html" />
     <Content Include="Views\refresh.html" />

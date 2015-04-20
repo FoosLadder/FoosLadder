@@ -10,6 +10,7 @@
     
     @Styles.Render("~/css/extLibs")
     @Styles.Render("~/css/app")
+    <meta name="description" content="@ApplicationViewModel.ApplicationName" />
 </head>
 <body>
     <nav class="navbar navbar-default" role="navigation" data-ng-controller="IndexController">
@@ -42,8 +43,13 @@
     </div>
     @Scripts.Render("~/bundles/extLibs","~/bundles/app")
     <script>
-        var app = angular.module('foosLadderApp');
-        app.value("apiBaseUrl", "@ApplicationViewModel.ApiBaseUrl");
+    var app = angular.module('foosLadderApp');
+    //app.value("apiBaseUrl", "@ApplicationViewModel.ApiBaseUrl");
+
+        app.constant('appSettings', {
+            apiBaseUrl: "@ApplicationViewModel.ApiBaseUrl",
+            clientId: "@ApplicationViewModel.ClientId"
+        });
     </script>
 </body>
 </html>

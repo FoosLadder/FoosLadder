@@ -11,6 +11,17 @@
 
     foosLadderApp.config(['$routeProvider',
         function ($routeProvider) {
+
+            $routeProvider.when('/players', {
+                templateUrl: 'views/playerList.html',
+                controller: 'PlayerListController'
+            });
+
+            $routeProvider.when('/scores/submit', {
+                templateUrl: 'views/submitScores.html',
+                controller: 'SubmitScoresController'
+            });
+
             $routeProvider.when("/login", {
                 templateUrl: "views/login.html",
                 controller: "LoginController"
@@ -26,32 +37,28 @@
                 controller: "OrdersController"
             });
 
-            $routeProvider.when('/players', {
-                templateUrl: 'views/playerList.html',
-                controller: 'PlayerListController'
+            $routeProvider.when("/refresh", {
+                templateUrl: "views/refresh.html",
+                controller: "RefreshController"
             });
 
-            $routeProvider.when('/scores/submit', {
-                templateUrl: 'views/submitScores.html',
-                controller: 'SubmitScoresController'
+            $routeProvider.when("/tokens", {
+                templateUrl: "views/tokens.html",
+                controller: "TokensManagerController"
             });
 
-            //$routeProvider.when("/refresh", {
-            //    templateUrl: "/app/views/refresh.html",
-            //    controller: "refreshController"
-            //});
-
-            //$routeProvider.when("/tokens", {
-            //    templateUrl: "/app/views/tokens.html",
-            //    controller: "tokensManagerController"
-            //});
-
+            $routeProvider.when("/associate", {
+                templateUrl: "views/associate.html",
+                controller: "AssociateController"
+            });
 
             $routeProvider.otherwise({
                 redirectTo: '/players'
             });
         }
     ]);
+
+
 
     foosLadderApp.config(['$httpProvider', function ($httpProvider) {
         $httpProvider.interceptors.push('AuthInterceptorService');

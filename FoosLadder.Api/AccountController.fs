@@ -120,7 +120,7 @@ type AccountController() as this=
     [<OverrideAuthentication>]
     [<HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)>]
     [<AllowAnonymous>]
-    [<Route("ExternalLogin",Name="ExternalLogin")>]
+    [<Route("externalLogin",Name="externalLogin")>]
     member this.GetExternalLogin(provider, ?error) =
         match error with 
         | Some requestError -> this.BadRequest(Uri.EscapeUriString(requestError)) :> IHttpActionResult
@@ -153,7 +153,7 @@ type AccountController() as this=
                             this.Redirect(redirectUri) :> IHttpActionResult
 
     [<AllowAnonymous>]
-    [<Route("RegisterExternal")>]
+    [<Route("registerExternal")>]
     member this.RegisterExternal (model : RegisterExternalBindingModel) =
         if not this.ModelState.IsValid then
             this.BadRequest this.ModelState :> IHttpActionResult
@@ -191,7 +191,7 @@ type AccountController() as this=
 
     [<AllowAnonymous>]
     [<HttpGet>]
-    [<Route("ObtainLocalAccessToken")>]
+    [<Route("obtainLocalAccessToken")>]
     member this.ObtainLocalAccessToken provider externalAccessToken = 
             if String.IsNullOrWhiteSpace(provider) || String.IsNullOrWhiteSpace(externalAccessToken) then
                 this.BadRequest "Provider or external access token is not sent" :> IHttpActionResult
@@ -279,7 +279,7 @@ module TestOrders =
         {OrderID = 2; CustomerName = "Henry"; ShipperCity="Dover"; IsShipped=false}
     ]
 
-    [<RoutePrefix("api/Orders")>]
+    [<RoutePrefix("api/orders")>]
     type OrdersController() = 
         inherit ApiController()
 
