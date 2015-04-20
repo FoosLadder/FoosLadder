@@ -106,7 +106,7 @@ type AccountController() as this=
             else
                 let getClientIdAttempt = GetQueryString request "client_id"
                 match getClientIdAttempt with
-                | None -> {ValidationError= Some "client_Id is required"; RedirectUri = ""}
+                | None -> {ValidationError= Some "client_id is required"; RedirectUri = ""}
                 | Some clientId ->
                     let client = this.repo.FindClient clientId
                     if box client = null then
@@ -244,7 +244,7 @@ type AccountController() as this=
         identity.AddClaim(Claim(ClaimTypes.Name, userName))
         identity.AddClaim(Claim("role","user"))
 
-        let props =           AuthenticationProperties(IssuedUtc= Nullable(DateTimeOffset DateTime.UtcNow), ExpiresUtc = Nullable(DateTimeOffset (DateTime.UtcNow.Add(tokenExpiration))) )
+        let props = AuthenticationProperties(IssuedUtc= Nullable(DateTimeOffset DateTime.UtcNow), ExpiresUtc = Nullable(DateTimeOffset (DateTime.UtcNow.Add(tokenExpiration))) )
         let ticket = new AuthenticationTicket(identity,props)
         let accessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket)
         let tokenResponse = 

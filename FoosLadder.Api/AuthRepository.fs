@@ -6,18 +6,38 @@ open FoosLadder.Api.Models
 open Microsoft.AspNet.Identity
 open Microsoft.AspNet.Identity.EntityFramework
 open System
+open System.Linq
 open System.Collections.Generic
 open System.Threading.Tasks
+open HashHelper
 
 type AuthRepository() as this = 
     [<DefaultValue>]
     val mutable context : AuthContext
     [<DefaultValue>]
     val mutable userManager : UserManager<IdentityUser>
+
+    let buildClientList() = 
+        [ { Id = "foosLadderApp"
+            Secret = getHash("abc@foo/Time:DGoal!!!!142")
+            Name = "FoosLadder Front End"
+            ApplicationType = ApplicationTypes.JavaScript
+            Active = true
+            RefreshTokenLifeTime = 7200
+            AllowedOrigin = "http://localhost:50441" } ]
+    
+    let Seed(authContext : AuthContext) = 
+        if authContext.Clients.Count() > 0 then ()
+        else 
+            authContext.Clients.AddRange(buildClientList()) |> ignore
+            authContext.SaveChanges() |> ignore
     
     do 
         this.context <- new AuthContext()
+        //Seed(this.context)
         this.userManager <- new UserManager<IdentityUser>(new UserStore<IdentityUser>(this.context))
+
+
     
     member __.RegisterUser(userModel : UserModel) = 
         async { 

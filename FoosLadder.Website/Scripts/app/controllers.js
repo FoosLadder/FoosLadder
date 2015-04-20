@@ -123,7 +123,7 @@
         $scope.authentication = authService.authentication;
     }]);
 
-    foosLadderControllers.controller('LoginController', ['$scope', '$location', 'AuthService', 'ngAuthSettings', function ($scope, $location, authService, ngAuthSettings) {
+    foosLadderControllers.controller('LoginController', ['$scope', '$location', 'AuthService', 'appSettings', function ($scope, $location, authService, appSettings) {
 
         $scope.loginData = {
             userName: "",
@@ -149,8 +149,8 @@
 
             var redirectUri = location.protocol + '//' + location.host + '/authcomplete.html';
 
-            var externalProviderUrl = ngAuthSettings.apiServiceBaseUri + "api/Account/ExternalLogin?provider=" + provider
-                                                                        + "&response_type=token&client_id=" + ngAuthSettings.clientId
+            var externalProviderUrl = appSettings.apiBaseUrl + "account/ExternalLogin?provider=" + provider
+                                                                        + "&response_type=token&client_id=" + appSettings.clientId
                                                                         + "&redirect_uri=" + redirectUri;
             window.$windowScope = $scope;
 

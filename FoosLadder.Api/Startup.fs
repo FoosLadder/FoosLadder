@@ -50,7 +50,7 @@ module private ConfigurationHelpers =
 
     let RegisterConfiguration (config : HttpConfiguration) =
         config
-        |> ConfigureCorsPolicy
+        //|> ConfigureCorsPolicy
         |> ConfigureSerializationFormatters
         |> ConfigureWebApiAttributeRoutes
 
@@ -65,12 +65,7 @@ module private AuthenticationHelpers =
     open System.Collections.Generic
     open Microsoft.Owin.Security.Infrastructure
     open Microsoft.Owin.Security.Google
-
-    let getHash (input : string) = 
-        let hashAlgorithm = new SHA256CryptoServiceProvider()
-        let byteValue = System.Text.Encoding.UTF8.GetBytes(input)
-        let byteHash = hashAlgorithm.ComputeHash(byteValue)
-        Convert.ToBase64String byteHash
+    open HashHelper
 
     type GoogleAuthProvider() =
 
@@ -254,9 +249,19 @@ module private AuthenticationHelpers =
         )
 
     let createGoogleOAuthOptions() = 
+        let googleClientId = 
+            match Infrastructure.GetApplicationSetting "GoogleClientID" with
+            | Some value -> value
+            | None -> ""
+
+        let googleClientSecret = 
+            match Infrastructure.GetApplicationSetting "GoogleClientSecret" with
+            | Some value -> value
+            | None -> ""
+
         GoogleOAuth2AuthenticationOptions(
-            ClientId = "", 
-            ClientSecret = "", 
+            ClientId = googleClientId, 
+            ClientSecret = googleClientSecret, 
             Provider = new GoogleAuthProvider()
         )
     let createOAuthBearerOptions() = OAuthBearerAuthenticationOptions()
@@ -287,6 +292,8 @@ type Startup()=
         and private set value = oAuthBearerOptions <- value
 
     member __.Configuration(app : IAppBuilder) =
+        let instance = System.Data.Entity.SqlServer.SqlProviderServices.Instance
+        //let temp = new Microsoft.AspNet.Identity.EntityFramework.IdentityDbContext<Microsoft.AspNet.Identity.EntityFramework.IdentityUser>("AuthContext")
         let configuration = RegisterConfiguration (new HttpConfiguration())
         ConfigureAuthentication oAuthBearerOptions googleAuthOptions app |> ignore
         app.UseWebApi configuration |> ignore
