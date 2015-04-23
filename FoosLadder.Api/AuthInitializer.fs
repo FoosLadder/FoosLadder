@@ -6,6 +6,7 @@ open FoosLadder.Api.Models
 open HashHelper
 open System.Linq
 open FoosLadder.Api
+open System.Data.Entity
 
 type AuthInitializer() = 
     inherit System.Data.Entity.CreateDatabaseIfNotExists<AuthContext>()
@@ -24,7 +25,8 @@ type AuthInitializer() =
             AllowedOrigin = webRootUrl } ]
     
     override __.Seed(context : AuthContext) = 
-        if context.Clients.Count() > 0 then ()
+        if context.Clients <> null && Seq.length context.Clients > 0 then ()
         else 
+            context.Clients <- context.Set<Client>()
             context.Clients.AddRange(buildClientList()) |> ignore
             context.SaveChanges() |> ignore

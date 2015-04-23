@@ -3,23 +3,18 @@ open Microsoft.AspNet.Identity.EntityFramework
 open System.Data.Entity
 open FoosLadder.Api.Entities
 
-type AuthContext() = 
+type AuthContext()= 
     inherit IdentityDbContext<IdentityUser>("AuthContext")
 
-    //TODO find out which of these is better practice
-//    [<DefaultValue>] val mutable Clients : DbSet<Client>
-//    [<DefaultValue>] val mutable RefreshTokens : DbSet<RefreshToken>
-
-//    member val Clients = Unchecked.defaultof<DbSet<Client>> with get,set
-//    member val RefreshTokens = Unchecked.defaultof<DbSet<RefreshToken>> with get,set
-
-    let mutable clients = Unchecked.defaultof<DbSet<Client>>
-    let mutable refreshTokens  = Unchecked.defaultof<DbSet<RefreshToken>>
-
+    [<DefaultValue>] val mutable clients : DbSet<Client>
     member this.Clients
-        with get () = clients
-        and set value = clients <- value
+        with get () = this.clients
+        and set value = this.clients <- value
+
+    [<DefaultValue>] val mutable refreshTokens : DbSet<RefreshToken>
 
     member this.RefreshTokens
-        with get () = refreshTokens
-        and set value = refreshTokens <- value
+        with get () = this.refreshTokens
+        and set value = this.refreshTokens <- value
+
+    static member Create() = new  AuthContext()

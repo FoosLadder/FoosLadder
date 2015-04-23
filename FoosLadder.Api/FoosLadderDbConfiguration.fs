@@ -1,4 +1,4 @@
-﻿namespace FoosLadder.Api.DbConfiguration
+﻿namespace FoosLadder.Api.FoosDbConfiguration
 
 open System.Data.Entity
 open System.Data.Entity.Infrastructure
@@ -6,7 +6,7 @@ open System.Data.Entity.SqlServer
 open FoosLadder.Api.Context
 open FoosLadder.Api.Initializer
 
-type FoosLadderDbCOnfiguration() as this= 
+type FoosLadderDbConfiguration() as this= 
     inherit DbConfiguration()
 
     do

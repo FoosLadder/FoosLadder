@@ -1,6 +1,7 @@
 namespace FoosLadder.Api
 
 open Newtonsoft.Json
+open Microsoft.Owin
 open Owin
 open System.Net.Http.Formatting
 open System.Net.Http.Headers
@@ -50,7 +51,7 @@ module private ConfigurationHelpers =
 
     let RegisterConfiguration (config : HttpConfiguration) =
         config
-        //|> ConfigureCorsPolicy
+        |> ConfigureCorsPolicy
         |> ConfigureSerializationFormatters
         |> ConfigureWebApiAttributeRoutes
 
@@ -60,12 +61,12 @@ module private AuthenticationHelpers =
     open Microsoft.Owin
     open System
     open FoosLadder.Api.Entities
-    open System.Security.Cryptography
     open Microsoft.Owin.Security
     open System.Collections.Generic
     open Microsoft.Owin.Security.Infrastructure
     open Microsoft.Owin.Security.Google
     open HashHelper
+    open FoosLadder.Api.Context
 
     type GoogleAuthProvider() =
 
@@ -110,7 +111,7 @@ module private AuthenticationHelpers =
             
             member __.CreateAsync (context : AuthenticationTokenCreateContext) = 
                 let work = async {
-                    let clientId = context.Ticket.Properties.Dictionary.["as:clientId"]
+                    let clientId = context.Ticket.Properties.Dictionary.["as:client_id"]
                     if String.IsNullOrEmpty clientId then
                         ()
                     else 
@@ -146,6 +147,21 @@ module private AuthenticationHelpers =
     type SimpleAuthorizationServerProvider() = 
         inherit OAuthAuthorizationServerProvider()
 
+        override __.ValidateClientRedirectUri (context : OAuthValidateClientRedirectUriContext) = 
+            use repo = new AuthRepository()
+            let client = repo.FindClient(context.ClientId)
+            if box client = null then
+                context.SetError("invalid_clientId", sprintf "Client '%s' is not registered in the system." context.ClientId)
+                Task.Factory.StartNew(fun () -> ())
+            else
+                let expectedRootUri = Uri(context.Request.Uri, "/")
+                if expectedRootUri.AbsoluteUri = context.RedirectUri then 
+                    context.Validated() |> ignore
+                    Task.Factory.StartNew(fun () -> ())
+                else
+                    context.SetError("invalid_clientId", sprintf "Client '%s' is not registered in the system." context.ClientId)
+                    Task.Factory.StartNew(fun () -> ())
+
         //TODO should this be async wrapped as task i.e. let work = async {...}; Task.Factory.StartNew(fun () -> work |> Async.RunSynchronously)?
         override __.ValidateClientAuthentication (context : OAuthValidateClientAuthenticationContext) =
             let mutable clientId = ref String.Empty
@@ -159,6 +175,7 @@ module private AuthenticationHelpers =
                 context.SetError("invalid_clientId", "Client id should be sent.")
                 Task.Factory.StartNew(fun () -> ())
             else 
+                let authContext = context.OwinContext.Get<AuthContext>(typedefof<AuthContext>.ToString())
                 use repo = new AuthRepository()
                 client <- repo.FindClient(context.ClientId)
 
@@ -186,6 +203,7 @@ module private AuthenticationHelpers =
                             Task.Factory.StartNew(fun () -> ())
 
         override __.GrantResourceOwnerCredentials (context : OAuthGrantResourceOwnerCredentialsContext) = 
+            let temp =1
             let work = async {
                 let mutable allowedOrigin = context.OwinContext.Get<string>("as:clientAllowedOrigin")
                 allowedOrigin <- if allowedOrigin = null then "*" else allowedOrigin
@@ -214,7 +232,7 @@ module private AuthenticationHelpers =
                     let ticket = AuthenticationTicket(identity, props)
                     context.Validated(ticket) |> ignore
             } 
-            Task.Factory.StartNew(fun () -> work |> Async.RunSynchronously)
+             upcast Async.StartAsTask work
 
         //TODO should this be async wrapped as task i.e. let work = async {...}; Task.Factory.StartNew(fun () -> work |> Async.RunSynchronously)?
         override __.GrantRefreshToken (context : OAuthGrantRefreshTokenContext) =
@@ -242,7 +260,8 @@ module private AuthenticationHelpers =
     let createOAuthOptions() = 
         new OAuthAuthorizationServerOptions(
             AllowInsecureHttp = true,
-            TokenEndpointPath = PathString("/api/token"),             //AuthorizeEndpointPath = new PathString("/Account/Authorize"),
+            TokenEndpointPath = PathString("/api/token"),             
+            //AuthorizeEndpointPath = new PathString("api/account/externalLogin"),
             AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30.0),
             Provider = new SimpleAuthorizationServerProvider(),
             RefreshTokenProvider = new SimpleRefreshTokenProvider()
@@ -268,6 +287,10 @@ module private AuthenticationHelpers =
         
 
     let ConfigureAuthentication oAuthBearerOptions (googleAuthOptions :GoogleOAuth2AuthenticationOptions)  (app: IAppBuilder)  = 
+        app.CreatePerOwinContext<AuthContext>(AuthContext.Create) |> ignore
+//        app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+//        app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
+//        app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create)
         app.UseExternalSignInCookie(Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ExternalCookie)
 
 
@@ -278,6 +301,7 @@ module private AuthenticationHelpers =
 
 open ConfigurationHelpers
 open AuthenticationHelpers
+open System.Data.Entity
 
 type Startup()=
     static let mutable googleAuthOptions = createGoogleOAuthOptions()
@@ -294,9 +318,10 @@ type Startup()=
     member __.Configuration(app : IAppBuilder) =
         let instance = System.Data.Entity.SqlServer.SqlProviderServices.Instance
         //let temp = new Microsoft.AspNet.Identity.EntityFramework.IdentityDbContext<Microsoft.AspNet.Identity.EntityFramework.IdentityUser>("AuthContext")
+        //DbConfiguration.SetConfiguration( FoosDbConfiguration.FoosLadderDbConfiguration())
         let configuration = RegisterConfiguration (new HttpConfiguration())
         ConfigureAuthentication oAuthBearerOptions googleAuthOptions app |> ignore
         app.UseWebApi configuration |> ignore
 
-[<assembly: Microsoft.Owin.OwinStartup(typeof<Startup>)>]
+[<assembly: OwinStartup(typeof<Startup>)>]
 do()

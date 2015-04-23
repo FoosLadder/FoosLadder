@@ -11,31 +11,35 @@ open System.Collections.Generic
 open System.Threading.Tasks
 open HashHelper
 
-type AuthRepository() as this = 
+type AuthRepository(authContext : AuthContext) as this = 
     [<DefaultValue>]
     val mutable context : AuthContext
     [<DefaultValue>]
     val mutable userManager : UserManager<IdentityUser>
 
-    let buildClientList() = 
-        [ { Id = "foosLadderApp"
-            Secret = getHash("abc@foo/Time:DGoal!!!!142")
-            Name = "FoosLadder Front End"
-            ApplicationType = ApplicationTypes.JavaScript
-            Active = true
-            RefreshTokenLifeTime = 7200
-            AllowedOrigin = "http://localhost:50441" } ]
-    
-    let Seed(authContext : AuthContext) = 
-        if authContext.Clients.Count() > 0 then ()
-        else 
-            authContext.Clients.AddRange(buildClientList()) |> ignore
-            authContext.SaveChanges() |> ignore
+//    let buildClientList() = 
+//        [ { Id = "foosLadderApp"
+//            Secret = getHash("abc@foo/Time:DGoal!!!!142")
+//            Name = "FoosLadder Front End"
+//            ApplicationType = ApplicationTypes.JavaScript
+//            Active = true
+//            RefreshTokenLifeTime = 7200
+//            AllowedOrigin = "http://localhost:50441" } ]
+//    
+//    let Seed(authContext : AuthContext) = 
+//        let clientsSeq = authContext.Clients |> Seq.toList
+//        let clientsCount = clientsSeq |> List.length
+//        if clientsCount > 0 then ()
+//        else 
+//            authContext.Clients.AddRange(buildClientList()) |> ignore
+//            authContext.SaveChanges() |> ignore
     
     do 
-        this.context <- new AuthContext()
+        this.context <- authContext
         //Seed(this.context)
         this.userManager <- new UserManager<IdentityUser>(new UserStore<IdentityUser>(this.context))
+
+    new() = new AuthRepository(new AuthContext())
 
 
     
@@ -89,19 +93,33 @@ type AuthRepository() as this =
             else
                 return false
         }
+
+
+    let getExistingRefreshToken (tokens : RefreshToken seq) (newToken : RefreshToken) : RefreshToken option = 
+        if Seq.isEmpty tokens then
+            None
+        else 
+            let existingTokens = 
+                tokens
+                |> Seq.cast<RefreshToken>
+                |> Seq.filter (fun t -> t.Subject = newToken.Subject && t.ClientId = newToken.ClientId)
+            if Seq.isEmpty existingTokens then
+                None
+            else if box (Seq.head existingTokens) = null then
+                None
+            else                
+                Some <| Seq.head existingTokens
+
        
     member __.AddRefreshToken(newToken : RefreshToken) = 
         async {
-            let existingToken = 
-                this.context.RefreshTokens 
-                |> Seq.cast<RefreshToken>
-                |> Seq.filter (fun t -> t.Subject = newToken.Subject && t.ClientId = newToken.ClientId)
-                |> Seq.head
-            if box existingToken <> null then
-                let! result = this.RemoveRefreshToken existingToken 
+            let possibleExistingToken = getExistingRefreshToken (this.context.refreshTokens) newToken
+            match possibleExistingToken with
+            | None -> ()
+            | Some existingToken -> 
+                let! result = this.RemoveRefreshToken existingToken
                 ()
-            else 
-                ()
+
             this.context.RefreshTokens.Add(newToken) |> ignore
             let! result = this.context.SaveChangesAsync() |> Async.AwaitTask
             return result > 0

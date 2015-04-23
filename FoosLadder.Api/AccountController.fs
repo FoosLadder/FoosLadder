@@ -41,6 +41,7 @@ open Microsoft.Owin.Security.OAuth
 open Microsoft.Owin.Security
 open FoosLadder.Api.Models
 open Microsoft.AspNet.Identity.Owin
+open System.Web.Http.Owin
 open Microsoft.AspNet.Identity.EntityFramework
 
 //TODO reorganise modules and types
@@ -54,7 +55,8 @@ type AccountController() as this=
     do 
         this.repo <- new AuthRepository()
 
-    member val private Authentication = this.Request.GetOwinContext().Authentication with get
+    member private this.Authentication
+         with get () =  this.Request.GetOwinContext().Authentication
 
     member private __.GetErrorResult (result : IdentityResult) = 
         if result = null then

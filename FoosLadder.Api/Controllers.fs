@@ -31,6 +31,7 @@ module Players =
     type PlayerController() =
         inherit ApiController()
 
+        [<AllowAnonymous>]
         [<Route("")>]
         member this.Get() =
             match PlayerDbContext.LoadAll () with
